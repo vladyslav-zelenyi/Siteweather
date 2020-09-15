@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block pagantion %}
+{% endblock %}
+
+{% block content %}
+    <form action="{% url 'find_by' %}" method="post">
+
+        {% csrf_token %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="form-group">
+                    <label for="{{ form.city_name.id_for_label }}">
+                        <h6>
+                            City not found
+                        </h6>
+                    </label>
+                    {{ form.city_name }}
+                    <div class="invalid-feedback">
+                        {{ form.city_name.errors }}
+                    </div>
+                </div>
+
+                {{ form.non_field_errors }}
+                <button type="submit" class="btn-primary btn-block">
+                    <h6>
+                        Try again
+                    </h6>
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

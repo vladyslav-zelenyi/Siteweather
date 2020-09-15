@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ city_item.city_name }} | {{ city_item.timestamp|date:'m/d/Y' }}
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block pagantion %}
+{% endblock %}
+
+{% block content %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>
+                {{ city_item.city_name }} | {{ city_item.country }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="media">
+                <img src="https://openweathermap.org/img/w/{{ city_item.weather_icon }}.png"/>
+                <div class="media-body">
+                    <h6 class="card-text">{{ city_item.temperature }}°C <br>
+                        {{ city_item.weather_full_description }}</h6>
+                    <h7 class="card-text">
+                        Humidity - {{ city_item.humidity }}% <br>
+                        Pressure - {{ city_item.pressure }} hPa <br>
+                        Wind speed - {{ city_item.wind_speed }} meter/sec
+                    </h7>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            {{ city_item.timestamp|date:'Y-m-d | H:i:s' }}
+        </div>
+    </div>
+{% endblock %}
