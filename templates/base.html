@@ -21,11 +21,10 @@
         <div class="col-md-4 ">
             {% block content %} <h1>Base</h1> {% endblock %}
 
-            {% block pagantion %}
-                Pagination
-            {% endblock %}
+            {% block pagantion %}{% endblock %}
+        </div>
+    </div>
 </div>
-</body>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
@@ -34,6 +33,5 @@
         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
         crossorigin="anonymous"></script>
 <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-
 </body>
 </html>

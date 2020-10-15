@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="{% url 'login' %}" method="post" autocomplete="off">
+        {% csrf_token %}
+    {{ form.as_p }}
+        <button type="submit" class="btn-primary btn-block">
+            <h6>Submit</h6>
+        </button>
+    </form>
+</body>
+</html>
