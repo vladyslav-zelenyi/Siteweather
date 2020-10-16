@@ -13,7 +13,7 @@
 
 {% block content %}
 
-    <form action="{% url 'find_by' %}" method="post" autocomplete="off">
+    <form action="{% url 'siteweather:find_by' %}" method="post" autocomplete="off">
 
         {% csrf_token %}
         <div class="card mb-4">
@@ -29,9 +29,8 @@
                         {{ form.city_name.errors }}
                     </div>
                 </div>
-
                 {{ form.non_field_errors }}
-                <button type="submit" class="btn-primary btn-block">
+                <button type="submit" class="btn-outline-success btn btn-block">
                     <h6>
                         Find
                     </h6>

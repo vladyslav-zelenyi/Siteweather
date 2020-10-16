@@ -1,16 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <form action="{% url 'login' %}" method="post" autocomplete="off">
+{% extends 'base.html' %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block content %}
+    <form action="{% url 'siteweather:login' %}" method="post" autocomplete="off">
         {% csrf_token %}
-    {{ form.as_p }}
-        <button type="submit" class="btn-primary btn-block">
-            <h6>Submit</h6>
-        </button>
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">
+                        <h6>Login:</h6>
+                        {{ form.username }} <br>
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </label>
+                    <label for="{{ form.password.id_for_label }}">
+                        <h6>Password:</h6>
+
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <br>
+                            {% for error in form.password.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </label>
+                    <button type="submit" class="btn-outline-success btn btn-block">
+                        <h6>Submit</h6>
+                    </button>
+                </div>
+            </div>
+        </div>
     </form>
-</body>
-</html>
+
+{% endblock %}
+
+{% block pagination %}
+{% endblock %}

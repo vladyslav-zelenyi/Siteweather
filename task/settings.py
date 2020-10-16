@@ -138,4 +138,3 @@ MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL = '/'
 
-# AUTH_USER_MODEL = 'siteweather.CustomUser'

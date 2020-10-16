@@ -2,9 +2,8 @@ import requests
 from django.contrib.auth.models import User
 
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import LoginView
+from django.views.generic import ListView, DetailView, RedirectView
+from django.contrib.auth import authenticate, login, logout
 from django.views import View
 
 from .models import CityBlock
@@ -13,7 +12,7 @@ from .forms import CityBlockForm, UserRegisterForm, UserLoginForm
 
 class RegisterFormView(View):
     form_class = UserRegisterForm
-    template_name = 'siteweather/registration.html'
+    template_name = 'registration/registration.html'
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
@@ -22,11 +21,11 @@ class RegisterFormView(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            login_ = form.cleaned_data['login']
+            username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
-            user = User.objects.create_user(username=login, password=password,
+            user = User.objects.create_user(username=username, password=password,
                                             first_name=first_name, last_name=last_name)
             user.save()
             return redirect('/')
@@ -35,7 +34,7 @@ class RegisterFormView(View):
 
 class UserLoginFormView(View):
     form_class = UserLoginForm
-    template_name = 'siteweather/login.html'
+    template_name = 'registration/login.html'
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
@@ -44,33 +43,28 @@ class UserLoginFormView(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            login_field = form.cleaned_data['login']
+            username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            user = authenticate(username=login_field, password=password)
+            user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                # redirect('/')
-            else:
-                pass
-        else:
-            form = UserLoginForm()
-        return render(request, 'siteweather/login.html', {'form': form})
+                user = User.objects.get(username=username)
+                return redirect('weather:profile', pk=user.id)
+        return render(request, 'registration/login.html', {'form': form})
 
 
-# def authenticate_user(request):
-#     if request.method == 'POST':
-#         form = UserLoginForm(request.POST)
-#         if form.is_valid():
-#             login = form.cleaned_data['login']
-#             password = form.cleaned_data['password']
-#             user = authenticate(username=login, password=password)
-#             if user is not None:
-#                 pass
-#             else:
-#                 pass
-#     else:
-#         form = UserLoginForm()
-#     return render(request, 'siteweather/login.html', {'form': form})
+class UserLogoutView(RedirectView):
+    pattern_name = 'siteweather:home'
+
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('siteweather:home')
+
+
+class UserProfile(DetailView):
+    model = User
+    context_object_name = 'profile'
+    template_name = 'registration/profile.html'
 
 
 class Home(ListView):
@@ -122,14 +116,3 @@ class FindCity(View):
             city = CityBlock.objects.create(**city_weather)
             return redirect(city)
         return render(request, self.template_name, {'form': form})
-
-# def city_filter(request):
-#     if request.method == 'POST':
-#         form = CityBlockForm(request.POST)
-#         if form.is_valid():
-#             city_name = form.cleaned_data['city_name']
-#             query = CityBlock.objects.raw("SELECT * FROM siteweather_cityblock WHERE city_name = %s", [city_name])
-#             return render(request, 'siteweather/page_filter.html', {'query': query})
-#     else:
-#         form = CityBlockForm()
-#     return render(request, 'siteweather/page_filter.html', {'form': form})
