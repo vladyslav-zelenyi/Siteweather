@@ -3,6 +3,22 @@ from django.db import models
 from django.urls import reverse
 
 
+class CustomUser(AbstractUser):
+    photo = models.ImageField(null=True, blank=True)
+    phone_number = models.CharField(verbose_name='Phone number', max_length=15, blank=True)
+
+    def get_absolute_url(self):
+        return reverse('weather:profile', kwargs={'pk': self.pk})
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
+        ordering = ['username']
+
+
 class CityBlock(models.Model):
     city_name = models.CharField(verbose_name='Name of city', max_length=300)
     weather_main_description = models.CharField(verbose_name='Main description', max_length=300, blank=True)
@@ -14,6 +30,7 @@ class CityBlock(models.Model):
     pressure = models.IntegerField(verbose_name='Pressure', default=0, blank=True)
     wind_speed = models.IntegerField(verbose_name='Wind speed', default=0, blank=True)
     country = models.CharField(verbose_name='Country', max_length=300, default='Unknown', blank=True)
+    # searched_by_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     def get_absolute_url(self):
         return reverse('siteweather:view_city', kwargs={'pk': self.pk})
@@ -25,8 +42,3 @@ class CityBlock(models.Model):
         verbose_name = 'City'
         verbose_name_plural = 'Cities'
         ordering = ['-timestamp']
-
-
-# class CustomUser(AbstractUser):
-#     photo = models.ImageField(null=True, blank=True)
-#     phone_number = models.CharField(verbose_name='Phone number', max_length=15, blank=True)

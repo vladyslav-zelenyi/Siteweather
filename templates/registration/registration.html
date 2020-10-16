@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block title %}
+    Registration
+{% endblock %}
+
+{% block content %}
+    <form action="{% url 'siteweather:registration' %}" method="post" autocomplete="off">
+        {% csrf_token %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">
+                        <h6>Username:</h6>
+                        {{ form.username }} <br>
+                        {% if form.errors %}
+                                {% for error in form.username.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                        {% endif %}
+                    </label>
+                    <label for="{{ form.password.id_for_label }}">
+                        <h6>Password:</h6>
+                        {{ form.password }}
+                    </label>
+                    <label for="{{ form.password2.id_for_label }}">
+                        <h6>Repeat password:</h6>
+                        {{ form.password2 }} <br>
+                        {% if form.errors %}
+                                {% for error in form.password2.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                        {% endif %}
+                    </label>
+                    <label for="{{ form.first_name.id_for_label }}">
+                        <h6>First name:</h6>
+                        {{ form.first_name }} <br>
+                        {% if form.errors %}
+                                {% for error in form.first_name.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                        {% endif %}
+                    </label>
+                    <label for="{{ form.last_name.id_for_label }}">
+                        <h6>Lastname:</h6>
+                        {{ form.last_name }} <br>
+                        {% if form.errors %}
+                                {% for error in form.last_name.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                        {% endif %}
+                    </label>
+                    <label for="{{ form.email.id_for_label }}">
+                        <h6>Email:</h6>
+                        {{ form.email }} <br>
+                        {% if form.errors %}
+                                {% for error in form.email.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                        {% endif %}
+                    </label>
+                    <label for="{{ form.phone_number.id_for_label }}">
+                        <h6>Phone number:</h6>
+                        {{ form.phone_number }} <br>
+                        {% if form.errors %}
+                                {% for error in form.phone_number.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                        {% endif %}
+                    </label>
+                    <button type="submit" class="btn-outline-success btn btn-block">
+                        <h6>Submit</h6>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block pagination %}
+{% endblock %}

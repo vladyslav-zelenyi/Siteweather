@@ -1,9 +1,8 @@
 import requests
-from django.contrib.auth.models import User
 
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, RedirectView
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.views import View
 
 from .models import CityBlock
@@ -25,8 +24,11 @@ class RegisterFormView(View):
             password = form.cleaned_data['password']
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
-            user = User.objects.create_user(username=username, password=password,
-                                            first_name=first_name, last_name=last_name)
+            email = form.cleaned_data['email']
+            phone_number = form.cleaned_data['phone_number']
+            user = get_user_model().objects.create_user(
+                username=username, password=password, first_name=first_name, last_name=last_name, email=email,
+                phone_number=phone_number)
             user.save()
             return redirect('/')
         return render(request, self.template_name, {'form': form})
@@ -48,7 +50,7 @@ class UserLoginFormView(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                user = User.objects.get(username=username)
+                user = get_user_model().objects.get(username=username)
                 return redirect('weather:profile', pk=user.id)
         return render(request, 'registration/login.html', {'form': form})
 
@@ -62,7 +64,7 @@ class UserLogoutView(RedirectView):
 
 
 class UserProfile(DetailView):
-    model = User
+    model = get_user_model()
     context_object_name = 'profile'
     template_name = 'registration/profile.html'
 
