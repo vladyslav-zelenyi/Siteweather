@@ -17,14 +17,14 @@
       <sourceFolder url="file://$MODULE_DIR$/siteweather" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.8 (task)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
       <list>
-        <option value="D:/task\templates" />
+        <option value="$MODULE_DIR$/templates" />
       </list>
     </option>
   </component>

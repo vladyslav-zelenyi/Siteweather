@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 
@@ -15,7 +16,7 @@ class CityBlock(models.Model):
     country = models.CharField(verbose_name='Country', max_length=300, default='Unknown', blank=True)
 
     def get_absolute_url(self):
-        return reverse('view_city', kwargs={'pk': self.pk})
+        return reverse('siteweather:view_city', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.city_name
@@ -24,3 +25,8 @@ class CityBlock(models.Model):
         verbose_name = 'City'
         verbose_name_plural = 'Cities'
         ordering = ['-timestamp']
+
+
+# class CustomUser(AbstractUser):
+#     photo = models.ImageField(null=True, blank=True)
+#     phone_number = models.CharField(verbose_name='Phone number', max_length=15, blank=True)

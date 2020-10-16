@@ -13,13 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-
+from task import settings
+from siteweather.views import RegisterFormView, UserLoginFormView, UserProfile
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('siteweather.urls')),
-]
+    path('', include('siteweather.urls', namespace='weather')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
