@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ profile.first_name }} {{ profile.last_name }}
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block pagination %}
+{% endblock %}
+
+{% block content %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>
+                {{ profile.first_name }} {{ profile.last_name }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="media">
+                <div class="media-body">
+                    <h7 class="card-text">
+                        {% if profile.username == user.username %}
+                            Username – {{ profile.username }} <br>
+                        {% else %}
+                            Username is hidden
+                        {% endif %}
+                        {% if profile.email %}
+                            Email – {{ profile.email }} <br>
+                        {% endif %}
+                        {% if profile.phone_number %}
+                            Phone number – {{ profile.phone_number }}
+                        {% endif %}
+                        {% if profile.photo %}
+                            Photo – {{ profile.photo }}
+                        {% endif %}
+                    </h7>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            {% if user.username == profile.username %}
+                Edit profile
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
