@@ -46,13 +46,15 @@ class UserRegisterForm(forms.Form):
         except ObjectDoesNotExist:
             pass
         if (len(str(data.get('phone_number')))) > 0:
-            letters_check = re.search(r'[qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM]\W', data.get('phone_number'))
+            letters_check = (data.get('phone_number'))[1:].isdecimal()
             symbols_check = re.search(r'\W', data.get('phone_number')[1:])
             plus_check = re.search(r'\W', data.get('phone_number')[0])
-            if plus_check is not None and symbols_check is None and letters_check is None:
+            print(plus_check)
+            print(data.get('phone_number')[0])
+            if plus_check is not None and symbols_check is None and letters_check is True:
                 if data.get('phone_number')[0] != '+':
                     self.add_error('phone_number', "Only '+' is allowed at the beginning")
-            if letters_check is not None or symbols_check is not None:
+            if letters_check is False or symbols_check is not None:
                 self.add_error('phone_number', 'Only numbers are allowed')
         return data
 
@@ -71,3 +73,4 @@ class UserLoginForm(forms.Form):
         if user is None:
             self.add_error('password', 'Wrong username or password')
         return data
+

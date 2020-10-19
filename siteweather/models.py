@@ -4,7 +4,7 @@ from django.urls import reverse
 
 
 class CustomUser(AbstractUser):
-    photo = models.ImageField(null=True, blank=True)
+    photo = models.ImageField(null=True, blank=True, upload_to='users/%Y/%m/%d')
     phone_number = models.CharField(verbose_name='Phone number', max_length=15, blank=True)
 
     def get_absolute_url(self):
