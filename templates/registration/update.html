@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ profile.first_name }} {{ profile.last_name }}
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block pagination %}
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post" autocomplete="off">
+        {% csrf_token %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>
+                    #
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="media">
+                    <div class="media-body">
+                        <h7 class="card-text">
+                            <label for="{{ form.first_name.id_for_label }}">
+                                <h6><strong>{{ profile.first_name }} </strong>| First name</h6>
+                                <input type="text" class="form-control" name="first_name">
+                                <br>
+                                {% if form.errors %}
+                                    {% for error in form.first_name.errors %}
+                                        <div class="alert alert-danger">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </label>
+                            <label for="{{ form.last_name.id_for_label }}">
+                                <h6><strong>{{ profile.last_name }} </strong>| Surname</h6>
+                                <input type="text" class="form-control" name="last_name">
+                                <br>
+                                {% if form.errors %}
+                                    {% for error in form.first_name.errors %}
+                                        <div class="alert alert-danger">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </label>
+                            <label for="{{ form.password.id_for_label }}">
+                                <h6>Password</h6>
+                                <input type="text" class="form-control" name="password">
+                                <br>
+                                {% if form.errors %}
+                                    {% for error in form.first_name.errors %}
+                                        <div class="alert alert-danger">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </label>
+                        </h7>
+                        <input type="submit" value="Update" class="btn-outline-success btn btn-block"/>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                #
+            </div>
+        </div>
+    </form>
+{% endblock %}

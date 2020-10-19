@@ -1,0 +1,19 @@
+a:link {
+    color: seagreen;
+}
+
+a:visited{
+    color: forestgreen;
+}
+
+a:hover {
+  color: yellowgreen;
+    text-decoration: none;
+}
+
+a:active{
+    color: seagreen;
+}
+
+    /*border-bottom-right-radius: 5px;*/
+    /*border-bottom-left-radius: 5px;*/
