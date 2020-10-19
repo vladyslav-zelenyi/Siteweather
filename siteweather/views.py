@@ -73,7 +73,7 @@ class UserProfile(DetailView):
 class UserProfileUpdate(UpdateView):
     model = get_user_model()
     template_name = 'registration/update.html'
-    fields = ['first_name', 'last_name', ]
+    fields = ['first_name', 'last_name', 'photo', 'email', 'phone_number']
     context_object_name = 'profile'
 
 
