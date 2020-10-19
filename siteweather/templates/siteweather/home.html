@@ -8,10 +8,9 @@
     {% include 'inc/_sidebar.html' %}
 {% endblock %}
 
-{% block pagantion %}
+{% block pagination %}
     {% include 'inc/_pagination.html' %}
 {% endblock %}
-
 
 
 {% block content %}
@@ -29,7 +28,8 @@
                         <h6 class="card-text">{{ item.temperature }}°C</h6>
                         <h5 class="card-text">{{ item.weather_main_description }}
                         </h5>
-                        <a href="{{ item.get_absolute_url }}" class="btn btn-outline-success btn-blockn">Read more</a>
+                        <a href="{{ item.get_absolute_url }}" class="btn btn-outline-success btn-blockn">Read
+                            more</a>
                     </div>
                 </div>
             </div>
@@ -38,5 +38,4 @@
             </div>
         </div>
     {% endfor %}
-
 {% endblock %}
