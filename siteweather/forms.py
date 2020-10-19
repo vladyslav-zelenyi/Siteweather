@@ -1,9 +1,14 @@
 import re
 
 from django import forms
-from django.contrib.auth import authenticate, get_user_model
+
+from django.contrib.auth import authenticate
+from django.contrib.auth.forms import UserCreationForm
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
+
+from siteweather import models
 
 
 class CityBlockForm(forms.Form):
@@ -31,21 +36,18 @@ class UserRegisterForm(forms.Form):
         data = self.cleaned_data
         if data.get('password') != data.get('password2'):
             self.add_error('password2', 'The verification password does not match the entered one')
-        if len(str(data.get('username'))) < 4:
+        if len(data.get('username')) < 4:
             self.add_error('username', 'Your username has to contain at least 4 symbols')
-        if ' ' in str(data.get('username')):
+        if ' ' in data.get('username'):
             self.add_error('username', 'No spaces allowed')
-        if len(str(data.get('first_name'))) < 2:
+        if len(data.get('first_name')) < 2:
             self.add_error('first_name', 'First name error')
-        if len(str(data.get('last_name'))) < 2:
+        if len(data.get('last_name')) < 2:
             self.add_error('last_name', 'Surname error')
-        try:
-            check_username = get_user_model().objects.get(username=data.get('username'))
-            if check_username:
-                self.add_error('username', 'Username is taken')
-        except ObjectDoesNotExist:
-            pass
-        if (len(str(data.get('phone_number')))) > 0:
+        check_username = models.CustomUser.objects.filter(username=data.get('username')).first()
+        if check_username:
+            self.add_error('username', 'Username is taken')
+        if data.get('phone_number'):
             letters_check = (data.get('phone_number'))[1:].isdecimal()
             symbols_check = re.search(r'\W', data.get('phone_number')[1:])
             plus_check = re.search(r'\W', data.get('phone_number')[0])
@@ -74,3 +76,8 @@ class UserLoginForm(forms.Form):
             self.add_error('password', 'Wrong username or password')
         return data
 
+
+class UserUpdateForm(UserRegisterForm):
+    class Meta:
+        model = models.CustomUser
+        exclude = ('password', 'password2')

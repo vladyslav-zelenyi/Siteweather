@@ -2,10 +2,10 @@ import requests
 
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, RedirectView, UpdateView
-from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth import authenticate, login, logout
 from django.views import View
 
-from .models import CityBlock
+from .models import CityBlock, CustomUser
 from .forms import CityBlockForm, UserRegisterForm, UserLoginForm
 
 
@@ -26,12 +26,16 @@ class RegisterFormView(View):
             last_name = form.cleaned_data['last_name']
             email = form.cleaned_data['email']
             phone_number = form.cleaned_data['phone_number']
-            user = get_user_model().objects.create_user(
-                username=username, password=password, first_name=first_name, last_name=last_name, email=email,
-                phone_number=phone_number)
-            user.save()
+            user = CustomUser.objects.create_user(
+                username=username,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone_number=phone_number,
+            )
             login(request, user)
-            return redirect('/')
+            return redirect('siteweather:profile', pk=user.pk)
         return render(request, self.template_name, {'form': form})
 
 
@@ -51,7 +55,7 @@ class UserLoginFormView(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                user = get_user_model().objects.get(username=username)
+                user = CustomUser.objects.get(username=username)
                 return redirect('weather:profile', pk=user.id)
         return render(request, 'registration/login.html', {'form': form})
 
@@ -65,16 +69,23 @@ class UserLogoutView(RedirectView):
 
 
 class UserProfile(DetailView):
-    model = get_user_model()
+    model = CustomUser
     context_object_name = 'profile'
     template_name = 'registration/profile.html'
 
 
 class UserProfileUpdate(UpdateView):
-    model = get_user_model()
+    model = CustomUser
     template_name = 'registration/update.html'
-    fields = ['first_name', 'last_name', 'photo', 'email', 'phone_number']
+    # fields = ['first_name', 'last_name', 'photo', 'email', 'phone_number']
     context_object_name = 'profile'
+    # form_class =
+    form_class = UserRegisterForm
+
+    def get(self, request, *args, **kwargs):
+        pass
+
+# class PasswordChangeView()
 
 
 class Home(ListView):
