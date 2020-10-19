@@ -1,7 +1,7 @@
 import requests
 
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, RedirectView
+from django.views.generic import ListView, DetailView, RedirectView, UpdateView
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.views import View
 
@@ -30,6 +30,7 @@ class RegisterFormView(View):
                 username=username, password=password, first_name=first_name, last_name=last_name, email=email,
                 phone_number=phone_number)
             user.save()
+            login(request, user)
             return redirect('/')
         return render(request, self.template_name, {'form': form})
 
@@ -67,6 +68,13 @@ class UserProfile(DetailView):
     model = get_user_model()
     context_object_name = 'profile'
     template_name = 'registration/profile.html'
+
+
+class UserProfileUpdate(UpdateView):
+    model = get_user_model()
+    template_name = 'registration/update.html'
+    fields = ['first_name', 'last_name', ]
+    context_object_name = 'profile'
 
 
 class Home(ListView):

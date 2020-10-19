@@ -14,8 +14,10 @@
 {% block content %}
     <div class="card mb-4">
         <div class="card-header">
-            <h5>
-                {{ profile.first_name }} {{ profile.last_name }}
+            <h5 style="color: forestgreen">
+                <strong>
+                    {{ profile.first_name }} {{ profile.last_name }}
+                </strong>
             </h5>
         </div>
         <div class="card-body">
@@ -25,16 +27,16 @@
                         {% if profile.username == user.username %}
                             Username – {{ profile.username }} <br>
                         {% else %}
-                            Username is hidden
+                            Username is hidden <br>
                         {% endif %}
                         {% if profile.email %}
                             Email – {{ profile.email }} <br>
                         {% endif %}
                         {% if profile.phone_number %}
-                            Phone number – {{ profile.phone_number }}
+                            Phone number – {{ profile.phone_number }} <br>
                         {% endif %}
                         {% if profile.photo %}
-                            Photo – {{ profile.photo }}
+                            <img src="{{ profile.photo.url }}" width="100%">
                         {% endif %}
                     </h7>
                 </div>
@@ -42,7 +44,9 @@
         </div>
         <div class="card-footer text-muted">
             {% if user.username == profile.username %}
-                Edit profile
+                <strong>
+                    <a href="/profile/{{ profile.id }}/update/">Edit profile</a>
+                </strong>
             {% endif %}
         </div>
     </div>

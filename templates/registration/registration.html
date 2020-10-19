@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-    <form action="{% url 'siteweather:registration' %}" method="post" autocomplete="off">
+    <form action="{% url 'weather:registration' %}" method="post" autocomplete="off">
         {% csrf_token %}
         <div class="card mb-4">
             <div class="card-header">
