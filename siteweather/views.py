@@ -89,7 +89,10 @@ class Home(ListView):
         return context
 
     def get_queryset(self):
-        return CityBlock.objects.all()
+        try:
+            return CityBlock.objects.filter(searched_by_user=self.request.user)
+        except TypeError:
+            return CityBlock.objects.all()
 
 
 class ViewCity(DetailView):
@@ -122,6 +125,7 @@ class FindCity(View):
                 'pressure': r['main']['pressure'],
                 'wind_speed': r['wind']['speed'],
                 'country': r['sys']['country'],
+                'searched_by_user': request.user,
             }
             city = CityBlock.objects.create(**city_weather)
             return redirect(city)

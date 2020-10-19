@@ -30,7 +30,7 @@ class CityBlock(models.Model):
     pressure = models.IntegerField(verbose_name='Pressure', default=0, blank=True)
     wind_speed = models.IntegerField(verbose_name='Wind speed', default=0, blank=True)
     country = models.CharField(verbose_name='Country', max_length=300, default='Unknown', blank=True)
-    searched_by_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    searched_by_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
 
     def get_absolute_url(self):
         return reverse('siteweather:view_city', kwargs={'pk': self.pk})
