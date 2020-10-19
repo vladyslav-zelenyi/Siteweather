@@ -12,62 +12,105 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" autocomplete="off">
-        {% csrf_token %}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>
-                    #
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="media">
-                    <div class="media-body">
-                        <h7 class="card-text">
-                            <label for="{{ form.first_name.id_for_label }}">
-                                <h6><strong>{{ profile.first_name }} </strong>| First name</h6>
-                                <input type="text" class="form-control" name="first_name">
-                                <br>
+    {% if profile.username == user.username %}
+        <form action="" method="post" autocomplete="off" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 style="color: forestgreen">
+                        <strong>
+                            {{ profile.first_name }} {{ profile.last_name }}
+                        </strong>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="media">
+                        <div class="media-body">
+                            <h7 class="card-text">
+                                <label for="id_first_name">
+                                    <h6>First name:</h6>
+                                    <input type="text" class="form-control" name="first_name"
+                                           value="{{ profile.first_name }}">
+                                    {% if form.errors %}
+                                        {% for error in form.first_name.errors %}
+                                            <div class="alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </label>
+                                <label for="id_last_name">
+                                    <h6>Last name:</h6>
+                                    <input type="text" class="form-control" name="last_name"
+                                           value="{{ profile.last_name }}">
+                                    {% if form.errors %}
+                                        {% for error in form.last_name.errors %}
+                                            <div class="alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </label>
+                                <label for="id_email">
+                                    <h6>Email:</h6>
+                                    <input type="text" class="form-control" name="email"
+                                           value="{{ profile.email }}">
+                                    {% if form.errors %}
+                                        {% for error in form.email.errors %}
+                                            <br>
+                                            <div class="alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </label>
+                                <label for="id_phone_number">
+                                    <h6>Phone number:</h6>
+                                    <input type="text" class="form-control" name="phone_number"
+                                           value="{{ profile.phone_number }}">
+                                    {% if form.errors %}
+                                        {% for error in form.phone_number.errors %}
+                                            <br>
+                                            <div class="alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </label>
+                                <label for="id_photo">
+                                    <h6>Photo:</h6>
+                                    {% if profile.photo %}
+                                        Currently: <img src="{{ profile.photo.url }}" width=100%></a>
+                                    {% endif %}
+                                    <input type="checkbox" name="photo-clear" id="photo-clear_id">
+                                    <label for="photo-clear_id">Clear</label><br>
+                                    Change:
+                                    <input type="file" name="photo" accept="image/*" id="id_photo">
+                                </label>
                                 {% if form.errors %}
-                                    {% for error in form.first_name.errors %}
+                                    {% for error in form.email.errors %}
+                                        <br>
                                         <div class="alert alert-danger">
                                             <strong>{{ error|escape }}</strong>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
-                            </label>
-                            <label for="{{ form.last_name.id_for_label }}">
-                                <h6><strong>{{ profile.last_name }} </strong>| Surname</h6>
-                                <input type="text" class="form-control" name="last_name">
-                                <br>
-                                {% if form.errors %}
-                                    {% for error in form.first_name.errors %}
-                                        <div class="alert alert-danger">
-                                            <strong>{{ error|escape }}</strong>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                            </label>
-                            <label for="{{ form.password.id_for_label }}">
-                                <h6>Password</h6>
-                                <input type="text" class="form-control" name="password">
-                                <br>
-                                {% if form.errors %}
-                                    {% for error in form.first_name.errors %}
-                                        <div class="alert alert-danger">
-                                            <strong>{{ error|escape }}</strong>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                            </label>
-                        </h7>
-                        <input type="submit" value="Update" class="btn-outline-success btn btn-block"/>
+                                </label>
+                            </h7>
+                            <button type="submit" class="btn-outline-success btn btn-block">
+                                Update
+                            </button>
+                        </div>
                     </div>
                 </div>
+                <div class="card-footer text-muted">
+                    <h6 style="color:seagreen">Username – {{ profile.username }}</h6>
+                </div>
             </div>
-            <div class="card-footer text-muted">
-                #
-            </div>
+        </form>
+    {% else %}
+        <div class="alert alert-danger">
+            <strong>You are not allowed to edit {{ user.first_name }}'s information.</strong>
         </div>
-    </form>
+    {% endif %}
 {% endblock %}
