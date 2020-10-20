@@ -12,7 +12,6 @@
 {% endblock %}
 
 {% block content %}
-    {#    {% if profile.username == user.username %}#}
     <form action="" method="post" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="card mb-4">
@@ -110,9 +109,4 @@
             </div>
         </div>
     </form>
-    {#    {% else %}#}
-    {#        <div class="alert alert-danger">#}
-    {#            <strong>You are not allowed to edit {{ user.first_name }}'s information.</strong>#}
-    {#        </div>#}
-    {#    {% endif %}#}
 {% endblock %}
