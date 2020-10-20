@@ -38,4 +38,23 @@
             </div>
         </div>
     {% endfor %}
+    <form action="{% url 'siteweather:home' %}" method="get" autocomplete="off">
+        <label for="id_city_name_filter">
+            <h6>City:</h6>
+            <input type="search" class="form-control" name="city_name_filter"
+                   required="" id="id_city_name_filter">
+            {% if form.errors %}
+                {% for error in form.city_name.errors %}
+                    <br>
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </label>
+        <button type="submit" class="btn-outline-success btn btn-block">
+            Update
+        </button>
+        <br>
+    </form>
 {% endblock %}

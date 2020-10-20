@@ -111,3 +111,15 @@ class UserUpdatePasswordForm(UserRegisterForm):
         if data.get('password') != data.get('password2'):
             self.add_error('password2', 'The verification password does not match the entered one')
         return data
+
+
+class SendMailForm(forms.Form):
+    mail_to = forms.EmailField(max_length=300, label='mail_to', widget=forms.EmailInput(
+        attrs={'class': 'form-control'}))
+
+
+class CityBlockFilterForm(forms.Form):
+    city_name_filter = forms.CharField(max_length=300, label='city_name_filter', widget=forms.TextInput(
+        attrs={'class': 'form-control'}))
+    date_filter = forms.DateField(label='date_filter', widget=forms.DateInput(
+        attrs={'class': 'form-control'}))

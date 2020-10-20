@@ -44,7 +44,9 @@
         </div>
         <div class="card-footer text-muted">
                 <strong>
+                    {% if profile.username == user.username %}
                     <a href="/profile/{{ user.id }}/update/">Edit profile</a>
+                    {% endif %}
                 </strong>
         </div>
     </div>
