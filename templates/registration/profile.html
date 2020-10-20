@@ -23,7 +23,7 @@
         <div class="card-body">
             <div class="media">
                 <div class="media-body">
-                    <h7 class="card-text">
+                    <h6 class="card-text">
                         {% if profile.username == user.username %}
                             Username – {{ profile.username }} <br>
                         {% else %}
@@ -38,16 +38,14 @@
                         {% if profile.photo %}
                             <img src="{{ profile.photo.url }}" width="100%">
                         {% endif %}
-                    </h7>
+                    </h6>
                 </div>
             </div>
         </div>
         <div class="card-footer text-muted">
-            {% if user.username == profile.username %}
                 <strong>
-                    <a href="/profile/{{ profile.id }}/update/">Edit profile</a>
+                    <a href="/profile/{{ user.id }}/update/">Edit profile</a>
                 </strong>
-            {% endif %}
         </div>
     </div>
 {% endblock %}
