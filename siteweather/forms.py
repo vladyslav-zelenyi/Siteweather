@@ -96,4 +96,18 @@ class UserLoginForm(UserRegisterForm):
 
 class UserUpdateForm(BaseCustomUserForm):
     photo = forms.ImageField(label='photo', widget=forms.FileInput(
-        attrs={'class': 'form-control'}), required=False,)
+        attrs={'class': 'form-control'}), required=False, )
+
+
+class UserUpdatePasswordForm(UserRegisterForm):
+    email = None
+    phone_number = None
+    first_name = None
+    last_name = None
+    username = None
+
+    def clean(self):
+        data = self.cleaned_data
+        if data.get('password') != data.get('password2'):
+            self.add_error('password2', 'The verification password does not match the entered one')
+        return data

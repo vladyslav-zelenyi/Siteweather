@@ -12,4 +12,5 @@ urlpatterns = [
     path('registration/', RegisterFormView.as_view(), name='registration'),
     path('profile/<int:pk>/', UserProfile.as_view(), name='profile'),
     path('profile/<int:pk>/update/', UserProfileUpdate.as_view(), name='update'),
+    path('profile/<int:pk>/password_update/', UserPasswordUpdate.as_view(), name='password_update'),
 ]

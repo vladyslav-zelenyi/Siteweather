@@ -25,7 +25,7 @@
             <div class="card-body">
                 <div class="media">
                     <div class="media-body">
-                        <h7 class="card-text">
+                        <h6 class="card-text">
                             <label for="id_first_name">
                                 <h6>First name:</h6>
                                 <input type="text" class="form-control" name="first_name"
@@ -97,7 +97,7 @@
                                 {% endfor %}
                             {% endif %}
                             </label>
-                        </h7>
+                        </h6>
                         <button type="submit" class="btn-outline-success btn btn-block">
                             Update
                         </button>
@@ -105,7 +105,9 @@
                 </div>
             </div>
             <div class="card-footer text-muted">
-                <h6 style="color:seagreen">Username – {{ user.username }}</h6>
+                <strong>
+                    <a href="/profile/{{ user.pk }}/password_update/">Change password</a>
+                </strong>
             </div>
         </div>
     </form>

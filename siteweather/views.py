@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.views import View
 
 from .models import CityBlock, CustomUser
-from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm
+from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm, UserUpdatePasswordForm
 
 
 class RegisterFormView(View):
@@ -93,7 +93,7 @@ class UserProfileUpdate(UpdateView):
             user.email = form.cleaned_data['email']
             user.phone_number = form.cleaned_data['phone_number']
             check = request.POST.get('photo-clear')
-            if check is 'on':
+            if check == 'on':
                 user.photo = None
             if check is None and form.cleaned_data['photo'] is None:
                 pass
@@ -103,7 +103,25 @@ class UserProfileUpdate(UpdateView):
             return redirect('siteweather:profile', pk=user.pk)
         return render(request, self.template_name, {'form': form})
 
-# class PasswordChangeView()
+
+class UserPasswordUpdate(UpdateView):
+    model = CustomUser
+    context_object_name = 'profile'
+    form_class = UserUpdatePasswordForm
+    template_name = 'registration/password_update.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            user = request.user
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return redirect('/', pk=user.pk)
+        return render(request, self.template_name, {'form': form})
 
 
 class Home(ListView):
