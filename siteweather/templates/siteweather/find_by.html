@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    {{ title }}
+    Find by city name
 {% endblock %}
 
 {% block sidebar %}
@@ -25,11 +25,15 @@
                         </h6>
                     </label>
                     {{ form.city_name }}
-                    <div class="invalid-feedback">
-                        {{ form.city_name.errors }}
-                    </div>
+                    {% if form.errors %}
+                        <br>
+                        {% for error in form.city_name.errors %}
+                            <div class="alert alert-danger">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
-                {{ form.non_field_errors }}
                 <button type="submit" class="btn-outline-success btn btn-block">
                     <h6>
                         Find

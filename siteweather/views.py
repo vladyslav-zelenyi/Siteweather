@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.views import View
 
 from .models import CityBlock, CustomUser
-from .forms import CityBlockForm, UserRegisterForm, UserLoginForm
+from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm
 
 
 class RegisterFormView(View):
@@ -76,14 +76,32 @@ class UserProfile(DetailView):
 
 class UserProfileUpdate(UpdateView):
     model = CustomUser
-    template_name = 'registration/update.html'
-    # fields = ['first_name', 'last_name', 'photo', 'email', 'phone_number']
     context_object_name = 'profile'
-    # form_class =
-    form_class = UserRegisterForm
+    form_class = UserUpdateForm
+    template_name = 'registration/update.html'
 
     def get(self, request, *args, **kwargs):
-        pass
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.email = form.cleaned_data['email']
+            user.phone_number = form.cleaned_data['phone_number']
+            check = request.POST.get('photo-clear')
+            if check is 'on':
+                user.photo = None
+            if check is None and form.cleaned_data['photo'] is None:
+                pass
+            else:
+                user.photo = form.cleaned_data['photo']
+            user.save()
+            return redirect('siteweather:profile', pk=user.pk)
+        return render(request, self.template_name, {'form': form})
 
 # class PasswordChangeView()
 
