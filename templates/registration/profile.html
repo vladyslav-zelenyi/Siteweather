@@ -43,9 +43,13 @@
             </div>
         </div>
         <div class="card-footer text-muted">
-                <strong>
+            <strong>
+                {% if profile.username == user.username %}
                     <a href="/profile/{{ user.id }}/update/">Edit profile</a>
-                </strong>
+                    <br>
+                    <a href="{% url 'weather:mail' %}">Send email</a>
+                {% endif %}
+            </strong>
         </div>
     </div>
 {% endblock %}

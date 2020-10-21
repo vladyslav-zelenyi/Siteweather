@@ -6,10 +6,10 @@
         Find by city
     </a>
     {% if not user.is_authenticated %}
-        <a href="{% url 'siteweather:registration' %}" class="list-group-item list-group-item-action" }>
+        <a href="{% url 'siteweather:registration' %}" class="list-group-item list-group-item-action">
             Register
         </a>
-        <a href="{% url 'siteweather:login' %}" class="list-group-item list-group-item-action" }>
+        <a href="{% url 'siteweather:login' %}" class="list-group-item list-group-item-action">
             Login
         </a>
     {% else %}
@@ -19,7 +19,6 @@
             <button type="submit" formmethod="post" class="list-group-item list-group-item-action border-top-0">
                 Logout
             </button>
-            </a>
         </form>
     {% endif %}
 </div>

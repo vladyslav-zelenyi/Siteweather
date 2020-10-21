@@ -1,12 +1,14 @@
 import requests
 
+from task import settings
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, RedirectView, UpdateView
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
 
 from .models import CityBlock, CustomUser
-from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm, UserUpdatePasswordForm
+from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm, UserUpdatePasswordForm, SendMailForm
 
 
 class RegisterFormView(View):
@@ -137,7 +139,12 @@ class Home(ListView):
 
     def get_queryset(self):
         try:
-            return CityBlock.objects.filter(searched_by_user=self.request.user)
+            city = self.request.GET.get('city_name_filter')
+            result = CityBlock.objects.filter(searched_by_user=self.request.user)
+            if self.request.GET.get('city_name_filter') is not None:
+                result = CityBlock.objects.filter(city_name=city)
+            print(result)
+            return result
         except TypeError:
             return CityBlock.objects.all()
 
@@ -176,4 +183,26 @@ class FindCity(View):
             }
             city = CityBlock.objects.create(**city_weather)
             return redirect(city)
+        return render(request, self.template_name, {'form': form})
+
+
+class SendMail(View):
+    form_class = SendMailForm
+    template_name = 'registration/mail.html'
+    subject = 'Django'
+    message = """Test message from Vlad.
+
+Kind regards,
+Vlad"""
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            send_mail(subject=self.subject, from_email=settings.EMAIL_HOST,
+                      message=self.message, recipient_list=[form.cleaned_data['mail_to']])
+            return redirect('weather:mail')
         return render(request, self.template_name, {'form': form})
