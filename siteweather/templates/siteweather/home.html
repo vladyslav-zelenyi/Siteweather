@@ -23,7 +23,7 @@
             </div>
             <div class="card-body">
                 <div class="media">
-                    <img src="https://openweathermap.org/img/w/{{ item.weather_icon }}.png"/>
+                    <img src="https://openweathermap.org/img/w/{{ item.weather_icon }}.png" alt="icon">
                     <div class="media-body">
                         <h6 class="card-text">{{ item.temperature }}°C</h6>
                         <h5 class="card-text">{{ item.weather_main_description }}
@@ -67,7 +67,7 @@
             {% endif %}
         </label>
         <button type="submit" class="btn-outline-success btn btn-block">
-            Update
+            Filter
         </button>
         <br>
     </form>

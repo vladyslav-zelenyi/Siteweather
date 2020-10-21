@@ -173,7 +173,7 @@ class FindCity(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            city_name = form.cleaned_data['city_name']
+            city_name = form.cleaned_data['city_name'].capitalize()
             url = f'http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid=21b7ad9e043e9a8fab161a49eafc3' \
                   f'27f&units=metric'
             r = requests.get(url).json()
