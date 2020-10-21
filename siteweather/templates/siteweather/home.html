@@ -28,7 +28,7 @@
                         <h6 class="card-text">{{ item.temperature }}°C</h6>
                         <h5 class="card-text">{{ item.weather_main_description }}
                         </h5>
-                        <a href="{{ item.get_absolute_url }}" class="btn btn-outline-success btn-blockn">Read
+                        <a href="{{ item.get_absolute_url }}" class="btn btn-outline-success btn-block">Read
                             more</a>
                     </div>
                 </div>
@@ -43,7 +43,20 @@
         <label for="id_city_name_filter">
             <h6>City:</h6>
             <input type="search" class="form-control" name="city_name_filter"
-                   required="" id="id_city_name_filter">
+                   id="id_city_name_filter">
+            {% if form.errors %}
+                {% for error in form.city_name.errors %}
+                    <br>
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </label>
+        <label for="id_date_filter">
+            <h6>Date:</h6>
+            <input type="date" class="form-control" name="date_filter"
+                   id="id_date_filter">
             {% if form.errors %}
                 {% for error in form.city_name.errors %}
                     <br>
@@ -58,5 +71,4 @@
         </button>
         <br>
     </form>
-
 {% endblock %}

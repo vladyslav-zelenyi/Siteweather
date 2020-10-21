@@ -140,10 +140,18 @@ class Home(ListView):
     def get_queryset(self):
         try:
             city = self.request.GET.get('city_name_filter')
-            result = CityBlock.objects.filter(searched_by_user=self.request.user)
-            if self.request.GET.get('city_name_filter') is not None:
-                result = CityBlock.objects.filter(city_name=city)
-            print(result)
+            date = self.request.GET.get('date_filter')
+            if str(self.request.user) == 'AnonymousUser':
+                result = CityBlock.objects.all()
+            else:
+                result = CityBlock.objects.filter(searched_by_user=self.request.user)
+            if city != '' and self.request.GET.get('city_name_filter') is not None:
+                result = result.filter(city_name=city)
+            if date != '' and self.request.GET.get('date_filter') is not None:
+                year = date[0:4]
+                month = date[5:7]
+                day = date[8:]
+                result = result.filter(timestamp__year=year, timestamp__month=month, timestamp__day=day)
             return result
         except TypeError:
             return CityBlock.objects.all()
@@ -179,8 +187,11 @@ class FindCity(View):
                 'pressure': r['main']['pressure'],
                 'wind_speed': r['wind']['speed'],
                 'country': r['sys']['country'],
-                'searched_by_user': request.user,
             }
+            if str(request.user) != 'AnonymousUser':
+                city_weather['searched_by_user'] = request.user
+            else:
+                city_weather['searched_by_user'] = CustomUser.objects.get(pk=1)
             city = CityBlock.objects.create(**city_weather)
             return redirect(city)
         return render(request, self.template_name, {'form': form})

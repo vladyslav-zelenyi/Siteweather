@@ -120,6 +120,6 @@ class SendMailForm(forms.Form):
 
 class CityBlockFilterForm(forms.Form):
     city_name_filter = forms.CharField(max_length=300, label='city_name_filter', widget=forms.TextInput(
-        attrs={'class': 'form-control'}))
+        attrs={'class': 'form-control'}),)
     date_filter = forms.DateField(label='date_filter', widget=forms.DateInput(
-        attrs={'class': 'form-control'}))
+        attrs={'class': 'form-control'}),)
