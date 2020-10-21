@@ -37,9 +37,12 @@ class RegisterFormView(View):
                 phone_number=phone_number,
             )
             login(request, user)
-            message = 'You have successfully registered on site'
-            send_mail(subject='registration', from_email='Site weather',
-                      message=message, recipient_list=[email])
+            message = 'You have successfully registered on the site'
+            send_mail(
+                subject='Registration',
+                from_email='Siteweather',
+                message=message,
+                recipient_list=[email])
             return redirect('siteweather:profile', pk=user.pk)
         return render(request, self.template_name, {'form': form})
 
@@ -141,28 +144,28 @@ class Home(ListView):
         return context
 
     def get_queryset(self):
-        try:
-            city = self.request.GET.get('city_name_filter')
-            date = self.request.GET.get('date_filter')
-            if str(self.request.user) == 'AnonymousUser':
-                result = CityBlock.objects.all()
-            else:
-                result = CityBlock.objects.filter(searched_by_user=self.request.user)
-            if city != '' and self.request.GET.get('city_name_filter') is not None:
-                result = result.filter(city_name=city)
-            if date != '' and self.request.GET.get('date_filter') is not None:
-                year = date[0:4]
-                month = date[5:7]
-                day = date[8:]
-                result = result.filter(timestamp__year=year, timestamp__month=month, timestamp__day=day)
-            return result
-        except TypeError:
-            return CityBlock.objects.all()
+        city = self.request.GET.get('city_name_filter')
+        date = self.request.GET.get('date_filter')
+        if str(self.request.user) == 'AnonymousUser':
+            result = CityBlock.objects.all()
+        else:
+            result = CityBlock.objects.filter(searched_by_user=self.request.user)
+        if city != '' and self.request.GET.get('city_name_filter') is not None:
+            result = result.filter(city_name=city)
+        if date != '' and self.request.GET.get('date_filter') is not None:
+            year = date[0:4]
+            month = date[5:7]
+            day = date[8:]
+            result = result.filter(timestamp__year=year, timestamp__month=month, timestamp__day=day)
+        return result
 
 
 class ViewCity(DetailView):
     model = CityBlock
     context_object_name = 'city_item'
+
+    def get(self, request, *args, **kwargs):
+        pass
 
 
 class FindCity(View):
@@ -196,24 +199,4 @@ class FindCity(View):
                 city_weather['searched_by_user'] = CustomUser.objects.get(pk=1)
             city = CityBlock.objects.create(**city_weather)
             return redirect(city)
-        return render(request, self.template_name, {'form': form})
-
-
-class SendMail(View):
-    subject = 'Django'
-    message = """Test message from Vlad.
-
-Kind regards,
-Vlad"""
-
-    def get(self, request, *args, **kwargs):
-        form = self.form_class()
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            send_mail(subject=self.subject, from_email=settings.EMAIL_HOST,
-                      message=self.message, recipient_list=[form.cleaned_data['mail_to']])
-            return redirect('weather:mail')
         return render(request, self.template_name, {'form': form})

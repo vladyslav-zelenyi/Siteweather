@@ -46,8 +46,6 @@
             <strong>
                 {% if profile.username == user.username %}
                     <a href="/profile/{{ user.id }}/update/">Edit profile</a>
-                    <br>
-                    <a href="{% url 'weather:mail' %}">Send email</a>
                 {% endif %}
             </strong>
         </div>

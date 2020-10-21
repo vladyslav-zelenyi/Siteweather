@@ -4,6 +4,7 @@ import requests
 from django import forms
 from django.contrib.auth import authenticate
 
+from .models import CustomUser
 from siteweather import models
 
 
@@ -51,6 +52,8 @@ class BaseCustomUserForm(forms.Form):
                     self.add_error('phone_number', "Only '+' is allowed at the beginning")
             if letters_check is False or symbols_check is not None:
                 self.add_error('phone_number', 'Only numbers are allowed')
+        if CustomUser.objects.filter(email=data.get('email')) is not None:
+            self.add_error('email', 'User with entered email exists')
         return data
 
 
