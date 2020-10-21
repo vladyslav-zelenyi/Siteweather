@@ -6,7 +6,7 @@ from .models import CityBlock, CustomUser
 class CityBlockAdmin(ModelAdmin):
     list_display = (
         'city_name', 'weather_main_description', 'weather_full_description', 'timestamp', 'temperature', 'wind_speed',
-        'humidity', 'pressure')
+        'humidity', 'pressure', 'searched_by_user')
     list_display_links = ('city_name',)
     search_fields = ('city_name', 'timestamp')
     list_filter = ('city_name', 'timestamp')

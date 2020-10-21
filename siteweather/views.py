@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.views import View
 
 from .models import CityBlock, CustomUser
-from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm, UserUpdatePasswordForm, SendMailForm
+from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm, UserUpdatePasswordForm
 
 
 class RegisterFormView(View):
@@ -37,6 +37,9 @@ class RegisterFormView(View):
                 phone_number=phone_number,
             )
             login(request, user)
+            message = 'You have successfully registered on site'
+            send_mail(subject='registration', from_email='Site weather',
+                      message=message, recipient_list=[email])
             return redirect('siteweather:profile', pk=user.pk)
         return render(request, self.template_name, {'form': form})
 
@@ -174,8 +177,7 @@ class FindCity(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             city_name = form.cleaned_data['city_name'].capitalize()
-            url = f'http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid=21b7ad9e043e9a8fab161a49eafc3' \
-                  f'27f&units=metric'
+            url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'
             r = requests.get(url).json()
             city_weather = {
                 'city_name': city_name,
@@ -198,8 +200,6 @@ class FindCity(View):
 
 
 class SendMail(View):
-    form_class = SendMailForm
-    template_name = 'registration/mail.html'
     subject = 'Django'
     message = """Test message from Vlad.
 

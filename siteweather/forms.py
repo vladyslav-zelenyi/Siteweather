@@ -113,11 +113,6 @@ class UserUpdatePasswordForm(UserRegisterForm):
         return data
 
 
-class SendMailForm(forms.Form):
-    mail_to = forms.EmailField(max_length=300, label='mail_to', widget=forms.EmailInput(
-        attrs={'class': 'form-control'}))
-
-
 class CityBlockFilterForm(forms.Form):
     city_name_filter = forms.CharField(max_length=300, label='city_name_filter', widget=forms.TextInput(
         attrs={'class': 'form-control'}),)
