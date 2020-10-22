@@ -65,6 +65,19 @@
                                     {% endfor %}
                                 {% endif %}
                             </label>
+                            <label for="id_city_name">
+                                <h6>City:</h6>
+                                <input type="text" class="form-control" name="city_name"
+                                       value="{{ user.user_city }}">
+                                {% if form.errors %}
+                                    {% for error in form.city_name.errors %}
+                                        <br>
+                                        <div class="alert alert-danger">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </label>
                             <label for="id_phone_number">
                                 <h6>Phone number:</h6>
                                 <input type="text" class="form-control" name="phone_number"
@@ -88,7 +101,7 @@
                                 Change:
                                 <input type="file" name="photo" accept="image/*" id="id_photo">
                                 {% if form.errors %}
-                                    {% for error in form.email.errors %}
+                                    {% for error in form.photo.errors %}
                                         <br>
                                         <div class="alert alert-danger">
                                             <strong>{{ error|escape }}</strong>

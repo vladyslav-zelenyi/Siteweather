@@ -39,8 +39,10 @@
             {% if CustomUser %}
                 Users from {{ city_item.city_name }}: <br>
                 {% for profile in CustomUser %}
-                    <a href="/profile/{{ profile.id }}/">{{ profile.first_name }} {{ profile.last_name }}, </a>
+                    <a href="/profile/{{ profile.id }}/">{{ profile.first_name }} {{ profile.last_name }}</a>,
                 {% endfor %}
+            {% else %}
+                No users from {{ city_item.city_name }}
             {% endif %}
         </div>
     </div>

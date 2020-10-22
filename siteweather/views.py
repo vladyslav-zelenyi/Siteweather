@@ -1,5 +1,6 @@
+from datetime import datetime
+
 import requests
-from django.core.exceptions import ValidationError
 
 from task import settings
 from django.core.mail import send_mail
@@ -17,11 +18,11 @@ class RegisterFormView(View):
     template_name = 'registration/registration.html'
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()
+        form = self.form_class(request.user)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.user, request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
@@ -56,11 +57,11 @@ class UserLoginFormView(View):
     template_name = 'registration/login.html'
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()
+        form = self.form_class(request.user)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.user, request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
@@ -85,6 +86,13 @@ class UserProfile(DetailView):
     context_object_name = 'profile'
     template_name = 'registration/profile.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(UserProfile, self).get_context_data(**kwargs)
+        return context
+
+    # def get(self, request, *args, **kwargs):
+    #     return request.META.get('HTTP_REFERER', '/')
+
 
 class UserProfileUpdate(UpdateView):
     model = CustomUser
@@ -93,17 +101,18 @@ class UserProfileUpdate(UpdateView):
     template_name = 'registration/update.html'
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()
+        form = self.form_class(request.user)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, request.FILES)
+        form = self.form_class(request.user, request.POST, request.FILES)
         if form.is_valid():
             user = request.user
             user.first_name = form.cleaned_data['first_name']
             user.last_name = form.cleaned_data['last_name']
             user.email = form.cleaned_data['email']
             user.phone_number = form.cleaned_data['phone_number']
+            user.user_city = form.cleaned_data['city_name']
             check = request.POST.get('photo-clear')
             if check == 'on':
                 user.photo = None
@@ -123,11 +132,11 @@ class UserPasswordUpdate(UpdateView):
     template_name = 'registration/password_update.html'
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()
+        form = self.form_class(request.user)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.user, request.POST)
         if form.is_valid():
             user = request.user
             user.set_password(form.cleaned_data['password'])
@@ -160,13 +169,15 @@ class Home(ListView):
             result = CityBlock.objects.all()
         else:
             result = CityBlock.objects.filter(searched_by_user=self.request.user)
-        if city != '' and self.request.GET.get('city_name_filter') is not None:
+        if city != '' and city is not None:
             result = result.filter(city_name=city)
-        if date != '' and self.request.GET.get('date_filter') is not None:
-            year = date[0:4]
-            month = date[5:7]
-            day = date[8:]
-            result = result.filter(timestamp__year=year, timestamp__month=month, timestamp__day=day)
+        if date != '' and city is not None:
+            date_res = datetime.strptime(date, '%Y-%m-%d')
+            result = result.filter(
+                timestamp__year=date_res.year,
+                timestamp__month=date_res.month,
+                timestamp__day=date_res.day
+            )
         return result
 
 

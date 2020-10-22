@@ -12,6 +12,11 @@
 {% endblock %}
 
 {% block content %}
+    <form method="get">
+        <button type="submit" class="btn-outline-success btn btn-block">
+            Button
+        </button>
+    </form>
     <div class="card mb-4">
         <div class="card-header">
             <h5 style="color: forestgreen">
@@ -19,6 +24,11 @@
                     {{ profile.first_name }} {{ profile.last_name }}
                 </strong>
             </h5>
+            {% if profile.username == user.username %}
+                <h6 style="color: forestgreen">
+                    {{ profile.username }}
+                </h6>
+            {% endif %}
         </div>
         <div class="card-body">
             <div class="media">
@@ -35,6 +45,7 @@
                         {% if profile.phone_number %}
                             Phone number – {{ profile.phone_number }} <br>
                         {% endif %}
+                        City - {{ profile.user_city }}
                         {% if profile.photo %}
                             <img src="{{ profile.photo.url }}" width="100%">
                         {% endif %}

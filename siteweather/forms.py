@@ -37,6 +37,10 @@ class BaseCustomUserForm(CityBlockForm):
     phone_number = forms.CharField(label='phone_number', max_length=15, widget=forms.TextInput(
         attrs={'class': 'form-control'}), required=False)
 
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         super(BaseCustomUserForm, self).clean()
         data = self.cleaned_data
@@ -53,8 +57,13 @@ class BaseCustomUserForm(CityBlockForm):
                     self.add_error('phone_number', "Only '+' is allowed at the beginning")
             if letters_check is False or symbols_check is not None:
                 self.add_error('phone_number', 'Only numbers are allowed')
-        if CustomUser.objects.filter(email=data.get('email')):
-            self.add_error('email', 'User with entered email exists')
+        if str(self.user) != 'AnonymousUser':
+            if self.user.email != data.get('email'):
+                if CustomUser.objects.filter(email=data.get('email')):
+                    self.add_error('email', 'User with entered email exists')
+        else:
+            if CustomUser.objects.filter(email=data.get('email')):
+                self.add_error('email', 'User with entered email exists')
         return data
 
 
@@ -116,6 +125,8 @@ class UserUpdatePasswordForm(UserRegisterForm):
         data = self.cleaned_data
         if data.get('password') != data.get('password2'):
             self.add_error('password2', 'The verification password does not match the entered one')
+        elif self.user.check_password(data.get('password')):
+            self.add_error('password2', 'You cannot change the password to the same')
         return data
 
 
