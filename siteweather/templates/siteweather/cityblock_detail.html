@@ -35,5 +35,13 @@
         <div class="card-footer text-muted">
             {{ city_item.timestamp|date:'Y-m-d | H:i:s' }}
         </div>
+        <div class="card-footer text-muted">
+            {% if CustomUser %}
+                Users from {{ city_item.city_name }}: <br>
+                {% for profile in CustomUser %}
+                    <a href="/profile/{{ profile.id }}/">{{ profile.first_name }} {{ profile.last_name }}, </a>
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

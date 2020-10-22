@@ -1,4 +1,5 @@
 import requests
+from django.core.exceptions import ValidationError
 
 from task import settings
 from django.core.mail import send_mail
@@ -28,6 +29,7 @@ class RegisterFormView(View):
             last_name = form.cleaned_data['last_name']
             email = form.cleaned_data['email']
             phone_number = form.cleaned_data['phone_number']
+            user_city = form.cleaned_data['city_name']
             user = CustomUser.objects.create_user(
                 username=username,
                 password=password,
@@ -35,6 +37,7 @@ class RegisterFormView(View):
                 last_name=last_name,
                 email=email,
                 phone_number=phone_number,
+                user_city=user_city,
             )
             login(request, user)
             message = 'You have successfully registered on the site'
@@ -42,7 +45,8 @@ class RegisterFormView(View):
                 subject='Registration',
                 from_email='Siteweather',
                 message=message,
-                recipient_list=[email])
+                recipient_list=[email]
+            )
             return redirect('siteweather:profile', pk=user.pk)
         return render(request, self.template_name, {'form': form})
 
@@ -127,8 +131,14 @@ class UserPasswordUpdate(UpdateView):
         if form.is_valid():
             user = request.user
             user.set_password(form.cleaned_data['password'])
+            password = form.cleaned_data['password']
             user.save()
-            return redirect('/', pk=user.pk)
+            send_mail(
+                subject='Password change',
+                from_email='Siteweather',
+                message=f"Your password has been changed to '{password}'",
+                recipient_list=[user.email])
+            return redirect('/')
         return render(request, self.template_name, {'form': form})
 
 
@@ -164,8 +174,10 @@ class ViewCity(DetailView):
     model = CityBlock
     context_object_name = 'city_item'
 
-    def get(self, request, *args, **kwargs):
-        pass
+    def get_context_data(self, **kwargs):
+        context = super(ViewCity, self).get_context_data(**kwargs)
+        context['CustomUser'] = CustomUser.objects.filter(user_city=context['object'])
+        return context
 
 
 class FindCity(View):

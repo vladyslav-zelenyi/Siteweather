@@ -4,6 +4,7 @@ import requests
 from django import forms
 from django.contrib.auth import authenticate
 
+from task import settings
 from .models import CustomUser
 from siteweather import models
 
@@ -16,8 +17,7 @@ class CityBlockForm(forms.Form):
         data = self.cleaned_data
         city_name = data.get('city_name')
         try:
-            url = f'http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid=21b7ad9e043e9a8fab161a49eafc3' \
-                  f'27f&units=metric'
+            url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'
             r = requests.get(url).json()
             city_weather = {
                 'weather_main_description': r['weather'][0]['main']
@@ -27,17 +27,18 @@ class CityBlockForm(forms.Form):
         return data
 
 
-class BaseCustomUserForm(forms.Form):
+class BaseCustomUserForm(CityBlockForm):
     first_name = forms.CharField(max_length=300, label='first_name', widget=forms.TextInput(
         attrs={'class': 'form-control'}))
     last_name = forms.CharField(max_length=300, label='last_name', widget=forms.TextInput(
         attrs={'class': 'form-control'}))
     email = forms.EmailField(label='email_field', widget=forms.EmailInput(
-        attrs={'class': 'form-control'}), required=False)
+        attrs={'class': 'form-control'}), required=True)
     phone_number = forms.CharField(label='phone_number', max_length=15, widget=forms.TextInput(
         attrs={'class': 'form-control'}), required=False)
 
     def clean(self):
+        super(BaseCustomUserForm, self).clean()
         data = self.cleaned_data
         if len(data.get('first_name')) < 2:
             self.add_error('first_name', 'First name is too short')
@@ -52,7 +53,7 @@ class BaseCustomUserForm(forms.Form):
                     self.add_error('phone_number', "Only '+' is allowed at the beginning")
             if letters_check is False or symbols_check is not None:
                 self.add_error('phone_number', 'Only numbers are allowed')
-        if CustomUser.objects.filter(email=data.get('email')) is not None:
+        if CustomUser.objects.filter(email=data.get('email')):
             self.add_error('email', 'User with entered email exists')
         return data
 
@@ -86,6 +87,7 @@ class UserLoginForm(UserRegisterForm):
     phone_number = None
     first_name = None
     last_name = None
+    city_name = None
 
     def clean(self):
         data = self.cleaned_data
@@ -108,6 +110,7 @@ class UserUpdatePasswordForm(UserRegisterForm):
     first_name = None
     last_name = None
     username = None
+    city_name = None
 
     def clean(self):
         data = self.cleaned_data
