@@ -42,7 +42,7 @@
         <label for="id_city_name_filter">
             <h6>City:</h6>
             <input type="search" class="form-control" name="city_name_filter"
-                   id="id_city_name_filter">
+                   id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter }}">
             {% if form.errors %}
                 {% for error in form.city_name.errors %}
                     <br>
@@ -55,7 +55,7 @@
         <label for="id_date_filter">
             <h6>Date:</h6>
             <input type="date" class="form-control" name="date_filter"
-                   id="id_date_filter">
+                   id="id_date_filter" value="{{ request.GET.dict.date_filter }}">
             {% if form.errors %}
                 {% for error in form.city_name.errors %}
                     <br>

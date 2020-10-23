@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import requests
+from django.contrib.messages.views import SuccessMessageMixin
 
 from task import settings
 from django.core.mail import send_mail
@@ -90,11 +91,11 @@ class UserProfile(DetailView):
         context = super(UserProfile, self).get_context_data(**kwargs)
         return context
 
-    # def get(self, request, *args, **kwargs):
-    #     return request.META.get('HTTP_REFERER', '/')
+    def get(self, request, *args, **kwargs):
+        return super(UserProfile, self).get(request, *args, *kwargs)
 
 
-class UserProfileUpdate(UpdateView):
+class UserProfileUpdate(SuccessMessageMixin, UpdateView):
     model = CustomUser
     context_object_name = 'profile'
     form_class = UserUpdateForm
@@ -165,7 +166,7 @@ class Home(ListView):
     def get_queryset(self):
         city = self.request.GET.get('city_name_filter')
         date = self.request.GET.get('date_filter')
-        if str(self.request.user) == 'AnonymousUser':
+        if self.request.user.is_anonymous:
             result = CityBlock.objects.all()
         else:
             result = CityBlock.objects.filter(searched_by_user=self.request.user)
@@ -191,6 +192,23 @@ class ViewCity(DetailView):
         return context
 
 
+class DeleteCityBlock(DetailView):
+    model = CityBlock
+    context_object_name = 'city_item'
+    template_name = 'siteweather/delete_confirmation.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DeleteCityBlock, self).get_context_data(**kwargs)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super(DeleteCityBlock, self).get(request, *args, *kwargs)
+
+    def post(self, request, *args, **kwargs):
+        CityBlock.objects.filter(pk=self.kwargs['pk']).delete()
+        return redirect('/')
+
+
 class FindCity(View):
     form_class = CityBlockForm
     template_name = 'siteweather/find_by.html'
@@ -202,7 +220,7 @@ class FindCity(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            city_name = form.cleaned_data['city_name'].capitalize()
+            city_name = form.cleaned_data['city_name'].title()
             url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'
             r = requests.get(url).json()
             city_weather = {
@@ -216,7 +234,7 @@ class FindCity(View):
                 'wind_speed': r['wind']['speed'],
                 'country': r['sys']['country'],
             }
-            if str(request.user) != 'AnonymousUser':
+            if self.request.user.is_authenticated:
                 city_weather['searched_by_user'] = request.user
             else:
                 city_weather['searched_by_user'] = CustomUser.objects.get(pk=1)

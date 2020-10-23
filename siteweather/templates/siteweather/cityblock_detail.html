@@ -9,6 +9,13 @@
 {% endblock %}
 
 {% block pagination %}
+    {% ifnotequal request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" request.get_full_path %}
+        {% if request.META.HTTP_REFERER is not None %}
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-success btn-block">
+                Previous page
+            </a>
+        {% endif %}
+    {% endifnotequal %}
 {% endblock %}
 
 {% block content %}
@@ -39,10 +46,21 @@
             {% if CustomUser %}
                 Users from {{ city_item.city_name }}: <br>
                 {% for profile in CustomUser %}
-                    <a href="/profile/{{ profile.id }}/">{{ profile.first_name }} {{ profile.last_name }}</a>,
+                    {% if not forloop.last %}
+                        <a href="/profile/{{ profile.id }}/">{{ profile.first_name }} {{ profile.last_name }}</a>,
+                    {% else %}
+                        <a href="/profile/{{ profile.id }}/">{{ profile.first_name }} {{ profile.last_name }}</a>
+                    {% endif %}
                 {% endfor %}
             {% else %}
                 No users from {{ city_item.city_name }}
+            {% endif %}
+        </div>
+        <div class="card-footer text-muted">
+            {% if city_item.searched_by_user == request.user %}
+                <a href="/siteweather/{{ city_item.id }}/delete_confirmation/">
+                    Delete this block
+                </a>
             {% endif %}
         </div>
     </div>

@@ -8,6 +8,9 @@
     Registration
 {% endblock %}
 
+{% block pagination %}
+{% endblock %}
+
 {% block content %}
     <form action="{% url 'weather:registration' %}" method="post" autocomplete="off">
         {% csrf_token %}
@@ -103,7 +106,4 @@
         </div>
     </form>
 
-{% endblock %}
-
-{% block pagination %}
 {% endblock %}
