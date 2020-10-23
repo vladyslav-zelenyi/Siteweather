@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ city_item.city_name }} | {{ city_item.timestamp|date:'m/d/Y' }}
+{% endblock %}
+
+{% block sidebar %}
+    {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block pagination %}
+    {% ifnotequal request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" request.get_full_path %}
+        {% if request.META.HTTP_REFERER is not None %}
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-success btn-block">
+                Previous page
+            </a>
+        {% endif %}
+    {% endifnotequal %}
+{% endblock %}
+
+{% block content %}
+    Are you sure?
+        <br>
+    {{ city_item.pk }}
+    <form action="" method="post">
+    {% csrf_token %}
+        <button type="submit" class="btn-outline-success btn btn-block">
+            Delete
+        </button>
+    <br>
+    </form>
+{% endblock %}
