@@ -1,5 +1,6 @@
 import re
 import requests
+import logging
 
 from django import forms
 from django.contrib.auth import authenticate
@@ -7,6 +8,8 @@ from django.contrib.auth import authenticate
 from task import settings
 from .models import CustomUser
 from siteweather import models
+
+logger = logging.getLogger('django')
 
 
 class CityBlockForm(forms.Form):
@@ -57,7 +60,7 @@ class BaseCustomUserForm(CityBlockForm):
                     self.add_error('phone_number', "Only '+' is allowed at the beginning")
             if letters_check is False or symbols_check is not None:
                 self.add_error('phone_number', 'Only numbers are allowed')
-        if str(self.user) != 'AnonymousUser':
+        if not self.user.is_anonymous:
             if self.user.email != data.get('email'):
                 if CustomUser.objects.filter(email=data.get('email')):
                     self.add_error('email', 'User with entered email exists')

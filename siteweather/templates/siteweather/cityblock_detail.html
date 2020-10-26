@@ -56,12 +56,12 @@
                 No users from {{ city_item.city_name }}
             {% endif %}
         </div>
-        <div class="card-footer text-muted">
-            {% if city_item.searched_by_user == request.user %}
+        {% if city_item.searched_by_user == request.user %}
+            <div class="card-footer text-muted">
                 <a href="/siteweather/{{ city_item.id }}/delete_confirmation/">
                     Delete this block
                 </a>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
