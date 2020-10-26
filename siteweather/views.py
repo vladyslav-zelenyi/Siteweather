@@ -1,7 +1,7 @@
+import logging
 from datetime import datetime
 
 import requests
-from django.contrib.messages.views import SuccessMessageMixin
 
 from task import settings
 from django.core.mail import send_mail
@@ -12,6 +12,8 @@ from django.views import View
 
 from .models import CityBlock, CustomUser
 from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm, UserUpdatePasswordForm
+
+logger = logging.getLogger('django')
 
 
 class RegisterFormView(View):
@@ -43,6 +45,7 @@ class RegisterFormView(View):
             )
             login(request, user)
             message = 'You have successfully registered on the site'
+            logger.info(f"{username} was registered and authorized")
             send_mail(
                 subject='Registration',
                 from_email='Siteweather',
@@ -70,7 +73,11 @@ class UserLoginFormView(View):
             if user is not None:
                 login(request, user)
                 user = CustomUser.objects.get(username=username)
+                logger.info(f"{username} was authorized")
                 return redirect('weather:profile', pk=user.id)
+        else:
+            if CustomUser.objects.filter(username=form.cleaned_data['username']):
+                logger.warning(f"Unsuccessful authorization into {form.cleaned_data['username']}")
         return render(request, 'registration/login.html', {'form': form})
 
 
@@ -78,6 +85,7 @@ class UserLogoutView(RedirectView):
     pattern_name = 'siteweather:home'
 
     def post(self, request, *args, **kwargs):
+        logger.info(f"{self.request.user.username} logged out")
         logout(request)
         return redirect('siteweather:home')
 
@@ -91,11 +99,8 @@ class UserProfile(DetailView):
         context = super(UserProfile, self).get_context_data(**kwargs)
         return context
 
-    def get(self, request, *args, **kwargs):
-        return super(UserProfile, self).get(request, *args, *kwargs)
 
-
-class UserProfileUpdate(SuccessMessageMixin, UpdateView):
+class UserProfileUpdate(UpdateView):
     model = CustomUser
     context_object_name = 'profile'
     form_class = UserUpdateForm
@@ -122,6 +127,7 @@ class UserProfileUpdate(SuccessMessageMixin, UpdateView):
             else:
                 user.photo = form.cleaned_data['photo']
             user.save()
+            logger.info(f"{user} updated his profile")
             return redirect('siteweather:profile', pk=user.pk)
         return render(request, self.template_name, {'form': form})
 
@@ -143,6 +149,7 @@ class UserPasswordUpdate(UpdateView):
             user.set_password(form.cleaned_data['password'])
             password = form.cleaned_data['password']
             user.save()
+            logger.warning(f'{user} updated his password')
             send_mail(
                 subject='Password change',
                 from_email='Siteweather',
@@ -205,6 +212,7 @@ class DeleteCityBlock(DetailView):
         return super(DeleteCityBlock, self).get(request, *args, *kwargs)
 
     def post(self, request, *args, **kwargs):
+        logger.warning(f"{self.request.user} deleted city. ID = {CityBlock.objects.filter(pk=self.kwargs['pk'])}")
         CityBlock.objects.filter(pk=self.kwargs['pk']).delete()
         return redirect('/')
 
@@ -239,5 +247,6 @@ class FindCity(View):
             else:
                 city_weather['searched_by_user'] = CustomUser.objects.get(pk=1)
             city = CityBlock.objects.create(**city_weather)
+            logger.info(f"City {city_name} was added by {self.request.user}")
             return redirect(city)
         return render(request, self.template_name, {'form': form})
