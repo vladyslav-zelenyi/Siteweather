@@ -13,9 +13,9 @@
 
 {% block content %}
     {% if request.user.is_authenticated %}
-        <form action="" method="post" autocomplete="off" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="card mb-4">
+        <div class="card mb-4">
+            <form action="" method="post" autocomplete="off" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="card-header">
                     <h5 style="color: forestgreen">
                         <strong>
@@ -117,19 +117,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer text-muted">
-                    <strong>
-                        <a href="/profile/{{ user.pk }}/password_update/">Change password</a>
-                    </strong>
-                </div>
+            </form>
+            <div class="card-footer text-muted">
+                <strong>
+                    <a href="/profile/{{ user.pk }}/password_update/">Change password</a>
+                </strong>
             </div>
-        </form>
+        </div>
     {% else %}
         <div class="alert alert-danger">
             <strong>
-                <h5>
-                    You are not authorized to view this page.
-                </h5>
+                You are not authorized to view this page.
             </strong>
         </div>
     {% endif %}

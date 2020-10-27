@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+import pytz
 import requests
 
 from task import settings
@@ -130,6 +131,17 @@ class UserProfileUpdate(UpdateView):
             logger.info(f"{user} updated his profile")
             return redirect('siteweather:profile', pk=user.pk)
         return render(request, self.template_name, {'form': form})
+
+
+class PersonalSiteSettings(View):
+    template_name = 'siteweather/site_settings.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'timezones': pytz.common_timezones})
+
+    def post(self, request, *args, **kwargs):
+        request.session['django_timezone'] = request.POST['timezone']
+        return redirect('/')
 
 
 class UserPasswordUpdate(UpdateView):

@@ -11,21 +11,17 @@
 
 {% block pagination %}
     {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" != '/login/' %}
-        {% ifnotequal request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" request.get_full_path %}
+        {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" == request.get_full_path %}
             {% if request.META.HTTP_REFERER is not None %}
                 <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-success btn-block">
                     Previous page
                 </a>
             {% endif %}
-        {% endifnotequal %}
+        {% endif %}
     {% endif %}
 {% endblock %}
 
 {% block content %}
-{#            {% timezone 'Europe/Paris' %}#}
-{#                Timezone: {{ view.request.META.TZ }}#}
-{#                {{ value|timezone:'Europe/Paris' }} - value of tz#}
-{#            {% endtimezone %}#}
     <div class="card mb-4">
         <div class="card-header">
             <h5 style="color: forestgreen">
@@ -33,11 +29,6 @@
                     {{ profile.first_name }} {{ profile.last_name }}
                 </strong>
             </h5>
-            {% if profile.username == user.username %}
-                <h6 style="color: forestgreen">
-                    {{ profile.username }}
-                </h6>
-            {% endif %}
         </div>
         <div class="card-body">
             <div class="media">
@@ -54,7 +45,8 @@
                         {% if profile.phone_number %}
                             Phone number – {{ profile.phone_number }} <br>
                         {% endif %}
-                        City - {{ profile.user_city }}
+                        City - {{ profile.user_city }} <br>
+{#                        Timezone - {{ request.session.django_timezone }} <br>#}
                         {% if profile.photo %}
                             <img src="{{ profile.photo.url }}" width="100%">
                         {% endif %}
