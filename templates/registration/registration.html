@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
+{% load siteweather_extras %}
 
 {% block sidebar %}
     {% include 'inc/_sidebar.html' %}
+    Last registered users:<br>
+    {% last_registered_users 3 %}
 {% endblock %}
 
 {% block title %}
@@ -10,6 +13,7 @@
 
 {% block pagination %}
 {% endblock %}
+
 
 {% block content %}
     <form action="{% url 'weather:registration' %}" method="post" autocomplete="off">
@@ -99,11 +103,14 @@
                         {% endif %}
                     </label>
                     <button type="submit" class="btn-outline-success btn btn-block">
-                        <h6>Submit</h6>
+                        Submit
                     </button>
                 </div>
             </div>
         </div>
     </form>
-
+{% endblock %}
+{% block time %}
+    <br>
+    {% include 'inc/_time.html' %}
 {% endblock %}

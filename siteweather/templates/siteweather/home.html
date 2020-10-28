@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load siteweather_extras %}
 
 {% block title %}
     {{ title }}
@@ -37,16 +38,14 @@
             </div>
         </div>
     {% endfor %}
-
-        {{ request.GET.dict.date_filter }}
     <form action="{% url 'siteweather:home' %}" method="get" autocomplete="off">
         <label for="id_city_name_filter">
-            <h6>City:</h6>
+            City:
             <input type="search" class="form-control" name="city_name_filter"
-                   id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter }}">
+                   id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter|correct_name }}">
         </label>
         <label for="id_date_filter">
-            <h6>Date:</h6>
+            Date:
             <input type="date" class="form-control" name="date_filter"
                    id="id_date_filter" value="{{ request.GET.dict.date_filter }}">
         </label>
@@ -55,4 +54,8 @@
         </button>
         <br>
     </form>
+{% endblock %}
+
+{% block time %}
+    {% include 'inc/_time.html' %}
 {% endblock %}

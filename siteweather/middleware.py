@@ -11,7 +11,4 @@ class TimezoneMiddleware:
         tzname = request.session.get('django_timezone')
         if tzname:
             timezone.activate(pytz.timezone(tzname))
-        # else:
-        #     timezone.deactivate()
-        # If 14, 15 lines are commented, timezone will not deactivate when user logs out or logs in.
         return self.get_response(request)

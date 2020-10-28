@@ -8,7 +8,7 @@ from task import settings
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, RedirectView, UpdateView
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.views import View
 
 from .models import CityBlock, CustomUser
@@ -23,6 +23,8 @@ class RegisterFormView(View):
 
     def get(self, request, *args, **kwargs):
         form = self.form_class(request.user)
+        # last_block = CityBlock.objects.order_by('-timestamp').first()
+        # , 'last_block': last_block
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
@@ -83,7 +85,6 @@ class UserLoginFormView(View):
 
 
 class UserLogoutView(RedirectView):
-    pattern_name = 'siteweather:home'
 
     def post(self, request, *args, **kwargs):
         logger.info(f"{self.request.user.username} logged out")
@@ -162,12 +163,17 @@ class UserPasswordUpdate(UpdateView):
             password = form.cleaned_data['password']
             user.save()
             logger.warning(f'{user} updated his password')
+            default_zone = settings.TIME_ZONE
+            current_timezone = pytz.timezone(request.session.get('django_timezone', default_zone))
+            time = datetime.now().astimezone(current_timezone)
+            time = f'{time.year}-{time.month}-{time.day} | {time.hour}:{time.minute}:{time.second}'
             send_mail(
                 subject='Password change',
                 from_email='Siteweather',
-                message=f"Your password has been changed to '{password}'",
+                message=f"Your password has been changed to '{password}'. Time - {time}",
                 recipient_list=[user.email])
-            return redirect('/')
+            update_session_auth_hash(request, form.user)
+            return redirect('siteweather:home')
         return render(request, self.template_name, {'form': form})
 
 
@@ -190,7 +196,9 @@ class Home(ListView):
         else:
             result = CityBlock.objects.filter(searched_by_user=self.request.user)
         if city != '' and city is not None:
-            result = result.filter(city_name=city)
+            city_name_buff = city.casefold()
+            correct_name = city_name_buff.title()
+            result = result.filter(city_name=correct_name)
         if date != '' and city is not None:
             date_res = datetime.strptime(date, '%Y-%m-%d')
             result = result.filter(

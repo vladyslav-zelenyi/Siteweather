@@ -11,7 +11,7 @@
 
 {% block pagination %}
     {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" != '/login/' %}
-        {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" == request.get_full_path %}
+        {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" != request.get_full_path %}
             {% if request.META.HTTP_REFERER is not None %}
                 <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-success btn-block">
                     Previous page
@@ -46,7 +46,6 @@
                             Phone number – {{ profile.phone_number }} <br>
                         {% endif %}
                         City - {{ profile.user_city }} <br>
-{#                        Timezone - {{ request.session.django_timezone }} <br>#}
                         {% if profile.photo %}
                             <img src="{{ profile.photo.url }}" width="100%">
                         {% endif %}
@@ -62,4 +61,8 @@
             </strong>
         </div>
     </div>
+{% endblock %}
+
+{% block time %}
+    {% include 'inc/_time.html' %}
 {% endblock %}

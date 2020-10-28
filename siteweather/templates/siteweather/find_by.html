@@ -19,9 +19,7 @@
 {% endblock %}
 
 {% block content %}
-
     <form action="{% url 'siteweather:find_by' %}" method="post" autocomplete="off">
-
         {% csrf_token %}
         <div class="card mb-4">
             <div class="card-header">
@@ -49,4 +47,8 @@
             </div>
         </div>
     </form>
+{% endblock %}
+
+{% block time %}
+    {% include 'inc/_time.html' %}
 {% endblock %}
