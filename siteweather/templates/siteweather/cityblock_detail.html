@@ -11,13 +11,13 @@
 {% endblock %}
 
 {% block pagination %}
-    {% ifnotequal request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" request.get_full_path %}
+    {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" != request.get_full_path %}
         {% if request.META.HTTP_REFERER is not None %}
             <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-success btn-block">
                 Previous page
             </a>
         {% endif %}
-    {% endifnotequal %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -29,9 +29,9 @@
         </div>
         {% searched_counter city_item request as counter %}
         {% for i in counter.values %}
-            {% if i > 1 %}
+            {% if not user.is_anonymous%}
                 <div class="card-header">
-                    Searched {{ i }} time(s)
+                    Searched {{ i }} time(s) by you
                 </div>
             {% endif %}
         {% endfor %}

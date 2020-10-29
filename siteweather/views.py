@@ -3,6 +3,8 @@ from datetime import datetime
 
 import pytz
 import requests
+from django.contrib.auth.models import Group
+from django.contrib.auth.views import LoginView
 
 from task import settings
 from django.core.mail import send_mail
@@ -23,8 +25,6 @@ class RegisterFormView(View):
 
     def get(self, request, *args, **kwargs):
         form = self.form_class(request.user)
-        # last_block = CityBlock.objects.order_by('-timestamp').first()
-        # , 'last_block': last_block
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
@@ -46,6 +46,8 @@ class RegisterFormView(View):
                 phone_number=phone_number,
                 user_city=user_city,
             )
+            group = Group.objects.get(name='Registered')
+            user.groups.add(group)
             login(request, user)
             message = 'You have successfully registered on the site'
             logger.info(f"{username} was registered and authorized")
@@ -59,7 +61,7 @@ class RegisterFormView(View):
         return render(request, self.template_name, {'form': form})
 
 
-class UserLoginFormView(View):
+class UserLoginFormView(LoginView):
     form_class = UserLoginForm
     template_name = 'registration/login.html'
 
@@ -84,11 +86,13 @@ class UserLoginFormView(View):
         return render(request, 'registration/login.html', {'form': form})
 
 
-class UserLogoutView(RedirectView):
+class UserLogoutView(View):
 
     def post(self, request, *args, **kwargs):
-        logger.info(f"{self.request.user.username} logged out")
+        timezone = request.session.get('django_timezone')
         logout(request)
+        logger.info(f"{self.request.user.username} logged out")
+        request.session['django_timezone'] = timezone
         return redirect('siteweather:home')
 
 
@@ -224,16 +228,13 @@ class DeleteCityBlock(DetailView):
     context_object_name = 'city_item'
     template_name = 'siteweather/delete_confirmation.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(DeleteCityBlock, self).get_context_data(**kwargs)
-        return context
-
     def get(self, request, *args, **kwargs):
         return super(DeleteCityBlock, self).get(request, *args, *kwargs)
 
     def post(self, request, *args, **kwargs):
-        logger.warning(f"{self.request.user} deleted city. ID = {CityBlock.objects.filter(pk=self.kwargs['pk'])}")
-        CityBlock.objects.filter(pk=self.kwargs['pk']).delete()
+        block_to_delete = CityBlock.objects.filter(pk=self.kwargs['pk'])
+        block_to_delete.delete()
+        logger.warning(f"{self.request.user} deleted city. ID = {self.kwargs['pk']}")
         return redirect('/')
 
 

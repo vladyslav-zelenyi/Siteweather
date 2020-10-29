@@ -3,11 +3,12 @@ import requests
 import logging
 
 from django import forms
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import Group
 
 from task import settings
-from .models import CustomUser
-from siteweather import models
+from siteweather.models import CustomUser
 
 logger = logging.getLogger('django')
 
@@ -87,7 +88,7 @@ class UserRegisterForm(BaseCustomUserForm):
             self.add_error('username', 'Your username has to contain at least 4 symbols')
         if ' ' in str(data.get('username')):
             self.add_error('username', 'No spaces allowed')
-        check_username = models.CustomUser.objects.filter(username=data.get('username')).first()
+        check_username = CustomUser.objects.filter(username=data.get('username')).first()
         if check_username:
             self.add_error('username', 'Username is taken')
         return data
@@ -135,6 +136,32 @@ class UserUpdatePasswordForm(UserRegisterForm):
 
 class CityBlockFilterForm(forms.Form):
     city_name_filter = forms.CharField(max_length=300, label='city_name_filter', widget=forms.TextInput(
-        attrs={'class': 'form-control'}),)
+        attrs={'class': 'form-control'}), )
     date_filter = forms.DateField(label='date_filter', widget=forms.DateInput(
-        attrs={'class': 'form-control'}),)
+        attrs={'class': 'form-control'}), )
+
+
+class GroupAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = Group
+        exclude = []
+
+    users = forms.ModelMultipleChoiceField(
+        queryset=CustomUser.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple('users', False)
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(GroupAdminForm, self).__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['users'].initial = self.instance.user_set.all()
+
+    def save_m2m(self):
+        self.instance.user_set.set(self.cleaned_data['users'])
+
+    def save(self, *args, **kwargs):
+        instance = super(GroupAdminForm, self).save()
+        self.save_m2m()
+        return instance
