@@ -13,7 +13,14 @@
             Login
         </a>
     {% else %}
-        <a href="/profile/{{ user.pk }}/" class="list-group-item list-group-item-action border-top-0">Profile</a>
+        <a href="/profile/{{ user.pk }}/" class="list-group-item list-group-item-action border-top-0">
+            Profile
+        </a>
+        {% if user.role == '2' or user.is_superuser %}
+            <a href="{% url 'siteweather:users_list' %}" class="list-group-item list-group-item-action border-top-0">
+                List of users
+            </a>
+        {% endif %}
         <form action="{% url 'siteweather:logout' %}" method="post" id="css_form_id">
             {% csrf_token %}
             <button type="submit" formmethod="post" class="list-group-item list-group-item-action border-top-0">

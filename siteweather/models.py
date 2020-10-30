@@ -8,6 +8,16 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(verbose_name='Phone number', max_length=15, blank=True)
     user_city = models.CharField(verbose_name='City', max_length=50, blank=True)
 
+    STANDARD = '1'
+    PREMIUM = '2'
+
+    ROLE_CHOICES = (
+        (STANDARD, 'Standard'),
+        (PREMIUM, 'Premium'),
+    )
+
+    role = models.CharField(max_length=100, choices=ROLE_CHOICES, default=STANDARD, verbose_name='Role')
+
     def get_absolute_url(self):
         return reverse('weather:profile', kwargs={'pk': self.pk})
 

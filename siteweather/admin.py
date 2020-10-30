@@ -23,6 +23,14 @@ class CustomUserAdmin(UserAdmin):
     list_display_links = ('username',)
     search_fields = ('username',)
     list_filter = ('date_joined', 'is_superuser',)
+    fieldsets = (
+        (None, {'fields': ('username', 'password', 'role')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone_number', 'user_city')}),
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
 
 
 admin.site.register(CityBlock, CityBlockAdmin)

@@ -14,5 +14,6 @@ urlpatterns = [
     path('profile/<int:pk>/', UserProfile.as_view(), name='profile'),
     path('profile/<int:pk>/update/', UserProfileUpdate.as_view(), name='update'),
     path('profile/<int:pk>/password_update/', UserPasswordUpdate.as_view(), name='password_update'),
-    path('siteweather/site_settings/', PersonalSiteSettings.as_view(), name='site_settings')
+    path('siteweather/site_settings/', PersonalSiteSettings.as_view(), name='site_settings'),
+    path('siteweather/registered_users/', UsersList.as_view(), name='users_list'),
 ]

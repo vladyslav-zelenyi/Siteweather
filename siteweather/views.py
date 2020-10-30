@@ -1,17 +1,18 @@
+import pytz
 import logging
+import requests
+
 from datetime import datetime
 
-import pytz
-import requests
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 
 from task import settings
+from django.views import View
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, RedirectView, UpdateView
+from django.views.generic import ListView, DetailView, UpdateView
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.views import View
 
 from .models import CityBlock, CustomUser
 from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm, UserUpdatePasswordForm
@@ -48,6 +49,9 @@ class RegisterFormView(View):
             )
             group = Group.objects.get(name='Registered')
             user.groups.add(group)
+            permissions = group.permissions.all()
+            for permission in permissions:
+                user.user_permissions.add(permission)
             login(request, user)
             message = 'You have successfully registered on the site'
             logger.info(f"{username} was registered and authorized")
@@ -181,6 +185,27 @@ class UserPasswordUpdate(UpdateView):
         return render(request, self.template_name, {'form': form})
 
 
+class UsersList(ListView):
+    model = CustomUser
+    template_name = 'siteweather/registered_users.html'
+    context_object_name = 'profile'
+    paginate_by = 8
+
+    def get_queryset(self):
+        city = self.request.GET.get('city_name_filter')
+        first_name = self.request.GET.get('first_name_filter')
+        last_name = self.request.GET.get('last_name_filter')
+        result = CustomUser.objects.all()
+        if city != '':
+            city = city.casefold().title()
+            result = CustomUser.objects.filter(user_city=city)
+        if first_name != '':
+            result = result.filter(first_name__startswith=first_name)
+        if last_name != '':
+            result = result.filter(last_name__startswith=last_name)
+        return result
+
+
 class Home(ListView):
     model = CityBlock
     template_name = 'siteweather/home.html'
@@ -189,7 +214,6 @@ class Home(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'List'
         return context
 
     def get_queryset(self):
@@ -200,9 +224,8 @@ class Home(ListView):
         else:
             result = CityBlock.objects.filter(searched_by_user=self.request.user)
         if city != '' and city is not None:
-            city_name_buff = city.casefold()
-            correct_name = city_name_buff.title()
-            result = result.filter(city_name=correct_name)
+            city = city.casefold().title()
+            result = result.filter(city_name=city)
         if date != '' and city is not None:
             date_res = datetime.strptime(date, '%Y-%m-%d')
             result = result.filter(
