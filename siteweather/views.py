@@ -196,12 +196,14 @@ class UsersList(ListView):
         first_name = self.request.GET.get('first_name_filter')
         last_name = self.request.GET.get('last_name_filter')
         result = CustomUser.objects.all()
-        if city != '':
-            city = city.casefold().title()
-            result = CustomUser.objects.filter(user_city=city)
-        if first_name != '':
+        if city != '' and city is not None and not city.isspace():
+            city = str(city).casefold().title().strip()
+            result = CustomUser.objects.filter(user_city__startswith=city)
+        if first_name != '' and first_name is not None and not first_name.isspace():
+            first_name = str(first_name).strip()
             result = result.filter(first_name__startswith=first_name)
-        if last_name != '':
+        if last_name != '' and last_name is not None and not last_name.isspace():
+            last_name = str(last_name).strip()
             result = result.filter(last_name__startswith=last_name)
         return result
 
@@ -223,9 +225,9 @@ class Home(ListView):
             result = CityBlock.objects.all()
         else:
             result = CityBlock.objects.filter(searched_by_user=self.request.user)
-        if city != '' and city is not None:
-            city = city.casefold().title()
-            result = result.filter(city_name=city)
+        if city != '' and city is not None and not city.isspace():
+            city = str(city).casefold().title().strip()
+            result = result.filter(city_name__startswith=city)
         if date != '' and city is not None:
             date_res = datetime.strptime(date, '%Y-%m-%d')
             result = result.filter(
