@@ -34,7 +34,7 @@
             <div class="media">
                 <div class="media-body">
                     <h6 class="card-text">
-                        {% if profile.username == user.username %}
+                        {% if profile.username == user.username or user.is_superuser %}
                             Username – {{ profile.username }} <br>
                         {% else %}
                             Username is hidden <br>
@@ -47,7 +47,7 @@
                         {% endif %}
                         City - {{ profile.user_city }} <br>
                         {% if profile.photo %}
-                            <img src="{{ profile.photo.url }}" width="100%">
+                            <img src="{{ profile.photo.url }}" width="100%" alt="profile_photo">
                         {% endif %}
                     </h6>
                 </div>

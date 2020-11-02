@@ -91,13 +91,18 @@ class UserLoginFormView(LoginView):
 
 
 class UserLogoutView(View):
+    url = 'siteweather:home'
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         timezone = request.session.get('django_timezone')
         logout(request)
         logger.info(f"{self.request.user.username} logged out")
         request.session['django_timezone'] = timezone
-        return redirect('siteweather:home')
+        return redirect(self.url)
+
+
+class AdminLogoutView(UserLogoutView):
+    url = '/admin/'
 
 
 class UserProfile(DetailView):
@@ -278,7 +283,7 @@ class FindCity(View):
             url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'
             r = requests.get(url).json()
             city_weather = {
-                'city_name': city_name,
+                'city_name': r['name'],
                 'weather_main_description': r['weather'][0]['main'],
                 'weather_full_description': r['weather'][0]['description'],
                 'weather_icon': r['weather'][0]['icon'],

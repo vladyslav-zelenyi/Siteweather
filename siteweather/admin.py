@@ -15,16 +15,18 @@ class CityBlockAdmin(ModelAdmin):
     list_display_links = ('city_name',)
     search_fields = ('city_name', 'timestamp')
     list_filter = ('city_name', 'timestamp')
+    list_per_page = 15
 
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     list_display = (
-        'username', 'email', 'first_name', 'last_name', 'phone_number'
+        'username', 'role', 'email', 'first_name', 'last_name', 'phone_number', 'is_superuser',
     )
     list_display_links = ('username',)
     search_fields = ('username',)
     list_filter = ('date_joined', 'is_superuser',)
+    list_editable = ('role',)
     fieldsets = (
         (None, {'fields': ('username', 'password', 'role')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone_number', 'user_city')}),
@@ -33,6 +35,8 @@ class CustomUserAdmin(UserAdmin):
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
+    list_per_page = 15
+    radio_fields = {'role': admin.VERTICAL}
 
 
 admin.site.unregister(Group)

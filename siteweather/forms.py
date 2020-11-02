@@ -20,13 +20,9 @@ class CityBlockForm(forms.Form):
     def clean(self):
         data = self.cleaned_data
         city_name = data.get('city_name')
-        try:
-            url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'
-            r = requests.get(url).json()
-            city_weather = {
-                'weather_main_description': r['weather'][0]['main']
-            }
-        except KeyError:
+        url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'
+        r = requests.get(url).json()
+        if r['cod'] == '404':
             self.add_error('city_name', f'City {city_name} was not found')
         return data
 
