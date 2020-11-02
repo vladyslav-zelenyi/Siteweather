@@ -19,40 +19,32 @@
 {% endblock %}
 
 {% block content %}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>
-                    {{ city_item.city_name }} | {{ city_item.country }}
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="media">
-                    <img src="https://openweathermap.org/img/w/{{ city_item.weather_icon }}.png" alt="icon">
-                    <div class="media-body">
-                        <h6 class="card-text">{{ city_item.temperature }}°C</h6>
-                        <h5 class="card-text">{{ city_item.weather_main_description }} </h5>
-                    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>
+                {{ city_item.city_name }} | {{ city_item.country }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="media">
+                <img src="https://openweathermap.org/img/w/{{ city_item.weather_icon }}.png" alt="icon">
+                <div class="media-body">
+                    <h6 class="card-text">{{ city_item.temperature }}°C</h6>
+                    <h5 class="card-text">{{ city_item.weather_main_description }} </h5>
                 </div>
             </div>
-            <div class="card-footer text-muted">
-                {{ city_item.timestamp|date:'Y-m-d | H:i:s' }}
-            </div>
         </div>
-    {% if user == city_item.searched_by_user %}
-        <form action="" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn-outline-success btn btn-block">
-                Delete
-            </button>
-            <br>
-        </form>
-    {% else %}
-        <div class="alert alert-danger btn btn-block">
-            <strong>
-                You do not have permission to delete this block
-            </strong>
+        <div class="card-footer text-muted">
+            {{ city_item.timestamp|date:'Y-m-d | H:i:s' }}
         </div>
-    {% endif %}
+    </div>
+    <form action="" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-outline-success btn btn-block">
+            Delete
+        </button>
+        <br>
+    </form>
 {% endblock %}
 
 {% block time %}

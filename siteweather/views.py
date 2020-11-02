@@ -4,6 +4,7 @@ import requests
 
 from datetime import datetime
 
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 
@@ -46,12 +47,12 @@ class RegisterFormView(View):
                 email=email,
                 phone_number=phone_number,
                 user_city=user_city,
+                role='Standard',
             )
             group = Group.objects.get(name='Registered')
             user.groups.add(group)
             permissions = group.permissions.all()
-            for permission in permissions:
-                user.user_permissions.add(permission)
+            user.user_permissions.set(permissions)
             login(request, user)
             message = 'You have successfully registered on the site'
             logger.info(f"{username} was registered and authorized")
@@ -197,20 +198,23 @@ class UsersList(ListView):
     paginate_by = 8
 
     def get_queryset(self):
-        city = self.request.GET.get('city_name_filter')
-        first_name = self.request.GET.get('first_name_filter')
-        last_name = self.request.GET.get('last_name_filter')
-        result = CustomUser.objects.all()
-        if city != '' and city is not None and not city.isspace():
-            city = str(city).casefold().title().strip()
-            result = CustomUser.objects.filter(user_city__startswith=city)
-        if first_name != '' and first_name is not None and not first_name.isspace():
-            first_name = str(first_name).strip()
-            result = result.filter(first_name__startswith=first_name)
-        if last_name != '' and last_name is not None and not last_name.isspace():
-            last_name = str(last_name).strip()
-            result = result.filter(last_name__startswith=last_name)
-        return result
+        if self.request.user.has_perm('siteweather.see_users'):
+            city = self.request.GET.get('city_name_filter')
+            first_name = self.request.GET.get('first_name_filter')
+            last_name = self.request.GET.get('last_name_filter')
+            result = CustomUser.objects.all()
+            if city != '' and city is not None and not city.isspace():
+                city = str(city).casefold().title().strip()
+                result = CustomUser.objects.filter(user_city__startswith=city)
+            if first_name != '' and first_name is not None and not first_name.isspace():
+                first_name = str(first_name).strip()
+                result = result.filter(first_name__startswith=first_name)
+            if last_name != '' and last_name is not None and not last_name.isspace():
+                last_name = str(last_name).strip()
+                result = result.filter(last_name__startswith=last_name)
+            return result
+        else:
+            return CustomUser.objects.filter(username=self.request.user.username)
 
 
 class Home(ListView):
@@ -249,11 +253,12 @@ class ViewCity(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ViewCity, self).get_context_data(**kwargs)
-        context['CustomUser'] = CustomUser.objects.filter(user_city=context['object'])
+        if self.request.user.has_perm('siteweather.see_users'):
+            context['CustomUser'] = CustomUser.objects.filter(user_city=context['object'])
         return context
 
 
-class DeleteCityBlock(DetailView):
+class DeleteCityBlock(UserPassesTestMixin, DetailView):
     model = CityBlock
     context_object_name = 'city_item'
     template_name = 'siteweather/delete_confirmation.html'
@@ -266,6 +271,10 @@ class DeleteCityBlock(DetailView):
         block_to_delete.delete()
         logger.warning(f"{self.request.user} deleted city. ID = {self.kwargs['pk']}")
         return redirect('/')
+
+    def test_func(self):
+        block_to_delete = CityBlock.objects.get(pk=self.kwargs['pk'])
+        return block_to_delete.searched_by_user == self.request.user
 
 
 class FindCity(View):

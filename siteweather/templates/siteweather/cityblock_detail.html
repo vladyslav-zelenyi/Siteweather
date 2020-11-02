@@ -29,7 +29,7 @@
         </div>
         {% searched_counter city_item request as counter %}
         {% for i in counter.values %}
-            {% if not user.is_anonymous%}
+            {% if not user.is_anonymous %}
                 <div class="card-header">
                     Searched {{ i }} time(s) by you
                 </div>
@@ -52,8 +52,8 @@
         <div class="card-footer text-muted">
             {{ city_item.timestamp|date:'Y-m-d | H:i:s' }}
         </div>
-        <div class="card-footer text-muted">
-            {% if CustomUser %}
+        {% if CustomUser %}
+            <div class="card-footer text-muted">
                 Users from {{ city_item.city_name }}: <br>
                 {% for profile in CustomUser %}
                     {% if not forloop.last %}
@@ -62,10 +62,10 @@
                         <a href="/profile/{{ profile.id }}/">{{ profile.first_name }} {{ profile.last_name }}</a>
                     {% endif %}
                 {% endfor %}
-            {% else %}
-                No users from {{ city_item.city_name }}
-            {% endif %}
-        </div>
+            </div>
+{#        {% else %}#}
+{#            No users from {{ city_item.city_name }}#}
+        {% endif %}
         {% if city_item.searched_by_user == request.user %}
             <div class="card-footer text-muted">
                 <a href="/siteweather/{{ city_item.id }}/delete_confirmation/">

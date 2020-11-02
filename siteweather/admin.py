@@ -7,6 +7,18 @@ from .forms import GroupAdminForm
 from siteweather.models import CityBlock, CustomUser
 
 
+def make_premium(modeladmin, request, queryset):
+    queryset.update(role='Premium')
+
+
+def make_standard(modeladmin, request, queryset):
+    queryset.update(role='Standard')
+
+
+make_premium.short_description = 'Grant Premium status to selected Users'
+make_standard.short_description = 'Grant Standard status to selected Users'
+
+
 @admin.register(CityBlock)
 class CityBlockAdmin(ModelAdmin):
     list_display = (
@@ -15,18 +27,17 @@ class CityBlockAdmin(ModelAdmin):
     list_display_links = ('city_name',)
     search_fields = ('city_name', 'timestamp')
     list_filter = ('city_name', 'timestamp')
-    list_per_page = 15
+    list_per_page = 10
 
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     list_display = (
-        'username', 'role', 'email', 'first_name', 'last_name', 'phone_number', 'is_superuser',
+        'username', 'colored_premium', 'email', 'first_name', 'last_name', 'phone_number', 'is_superuser',
     )
     list_display_links = ('username',)
     search_fields = ('username',)
     list_filter = ('date_joined', 'is_superuser',)
-    list_editable = ('role',)
     fieldsets = (
         (None, {'fields': ('username', 'password', 'role')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone_number', 'user_city')}),
@@ -35,8 +46,9 @@ class CustomUserAdmin(UserAdmin):
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
-    list_per_page = 15
+    list_per_page = 12
     radio_fields = {'role': admin.VERTICAL}
+    actions = [make_premium, make_standard]
 
 
 admin.site.unregister(Group)

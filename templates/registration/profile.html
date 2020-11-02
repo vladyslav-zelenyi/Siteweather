@@ -56,7 +56,7 @@
         <div class="card-footer text-muted">
             <strong>
                 {% if profile.username == user.username %}
-                    <a href="/profile/{{ user.id }}/update/">Edit profile</a> <br>
+                    <a href="{% url 'siteweather:profile_update' %}">Edit profile</a> <br>
                 {% endif %}
             </strong>
         </div>

@@ -10,13 +10,13 @@
 {% endblock %}
 
 {% block pagination %}
-    {% if user.role == '2' or user.is_superuser %}
+    {% if user.role == 'Premium' or user.is_superuser %}
         {% include 'inc/_users_pagination.html' %}
     {% endif %}
 {% endblock %}
 
 {% block content %}
-    {% if user.role == '2' or user.is_superuser %}
+    {% if user.role == 'Premium' or user.is_superuser %}
         <div class="list-group">
             {% for person in profile %}
                 <a href="/profile/{{ person.pk }}/" class="list-group-item-action list-group-item">
