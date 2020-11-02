@@ -19,6 +19,5 @@ def last_registered_users(count):
 
 @register.filter
 def correct_name(city_name):
-    buff = city_name.casefold()
-    result = buff.title()
-    return result
+    city_name = str(city_name).casefold().title().strip()
+    return city_name

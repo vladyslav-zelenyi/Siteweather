@@ -4,9 +4,10 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 
 from .forms import GroupAdminForm
-from .models import CityBlock, CustomUser
+from siteweather.models import CityBlock, CustomUser
 
 
+@admin.register(CityBlock)
 class CityBlockAdmin(ModelAdmin):
     list_display = (
         'city_name', 'weather_main_description', 'weather_full_description', 'timestamp', 'temperature', 'wind_speed',
@@ -16,6 +17,7 @@ class CityBlockAdmin(ModelAdmin):
     list_filter = ('city_name', 'timestamp')
 
 
+@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     list_display = (
         'username', 'email', 'first_name', 'last_name', 'phone_number'
@@ -33,15 +35,10 @@ class CustomUserAdmin(UserAdmin):
     )
 
 
-admin.site.register(CityBlock, CityBlockAdmin)
-admin.site.register(CustomUser, CustomUserAdmin)
-
 admin.site.unregister(Group)
 
 
+@admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     form = GroupAdminForm
     filter_horizontal = ['permissions']
-
-
-admin.site.register(Group, GroupAdmin)

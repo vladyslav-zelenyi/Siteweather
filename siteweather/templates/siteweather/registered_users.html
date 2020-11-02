@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
 {% load siteweather_extras %}
 
+{% block title %}
+    Registered users
+{% endblock %}
+
 {% block sidebar %}
     {% include 'inc/_sidebar.html' %}
 {% endblock %}
 
 {% block pagination %}
-    {% include 'inc/_users_pagination.html' %}
+    {% if user.role == '2' or user.is_superuser %}
+        {% include 'inc/_users_pagination.html' %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -21,35 +27,35 @@
                 </a>
             {% endfor %}
         </div>
+        <form action="{% url 'siteweather:users_list' %}" method="get" autocomplete="off">
+            <label for="id_city_name_filter">
+                City:
+                <input type="search" class="form-control" name="city_name_filter"
+                       id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter|correct_name }}">
+            </label>
+            <label for="id_first_name_filter">
+                First name:
+                <input type="search" class="form-control" name="first_name_filter"
+                       id="id_first_name_filter" value="{{ request.GET.dict.first_name_filter|correct_name }}">
+            </label>
+            <label for="id_last_name_filter">
+                Surname:
+                <input type="search" class="form-control" name="last_name_filter"
+                       id="id_last_ame_filter" value="{{ request.GET.dict.last_name_filter|correct_name }}">
+            </label>
+            <button type="submit" class="btn-outline-success btn btn-block">
+                Filter
+            </button>
+            <br>
+        </form>
     {% else %}
         <div class="alert alert-danger">
             <strong>
                 You are not authorized to view this page.
             </strong>
         </div>
-    {% endif %}
-    <br>
-    <form action="{% url 'siteweather:users_list' %}" method="get" autocomplete="off">
-        <label for="id_city_name_filter">
-            City:
-            <input type="search" class="form-control" name="city_name_filter"
-                   id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter|correct_name }}">
-        </label>
-        <label for="id_first_name_filter">
-            First name:
-            <input type="search" class="form-control" name="first_name_filter"
-                   id="id_first_name_filter" value="{{ request.GET.dict.first_name_filter|correct_name }}">
-        </label>
-        <label for="id_last_name_filter">
-            Surname:
-            <input type="search" class="form-control" name="last_name_filter"
-                   id="id_last_ame_filter" value="{{ request.GET.dict.last_name_filter|correct_name }}">
-        </label>
-        <button type="submit" class="btn-outline-success btn btn-block">
-            Filter
-        </button>
         <br>
-    </form>
+    {% endif %}
 {% endblock %}
 
 {% block time %}
