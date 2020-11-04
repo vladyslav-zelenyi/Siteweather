@@ -4,7 +4,7 @@ import requests
 
 from datetime import datetime
 
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 
@@ -26,6 +26,8 @@ class RegisterFormView(View):
     template_name = 'registration/registration.html'
 
     def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('siteweather:profile', pk=self.request.user.pk)
         form = self.form_class(request.user)
         return render(request, self.template_name, {'form': form})
 
@@ -71,6 +73,8 @@ class UserLoginFormView(LoginView):
     template_name = 'registration/login.html'
 
     def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('siteweather:profile', pk=self.request.user.pk)
         form = self.form_class(request.user)
         return render(request, self.template_name, {'form': form})
 

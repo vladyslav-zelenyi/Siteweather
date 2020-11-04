@@ -16,6 +16,16 @@
 {% endblock %}
 
 {% block content %}
+    {% if not profile %}
+        <div class="card card-body text-muted">
+            <strong>
+                Can not find any user from {{ request.GET.dict.city_name_filter|correct_name }}
+                <br>
+                whose name starts with {{ request.GET.dict.first_name_filter|correct_name }} {{ request.GET.dict.last_name_filter|correct_name }}
+            </strong>
+        </div>
+        <br>
+    {% endif %}
     {% if user.role == 'Premium' or user.is_superuser %}
         <div class="list-group">
             {% for person in profile %}
@@ -27,6 +37,7 @@
                 </a>
             {% endfor %}
         </div>
+        <br>
         <form action="{% url 'siteweather:users_list' %}" method="get" autocomplete="off">
             <label for="id_city_name_filter">
                 City:

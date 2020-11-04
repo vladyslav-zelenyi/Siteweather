@@ -16,7 +16,7 @@
         <a href="/profile/{{ user.pk }}/" class="list-group-item list-group-item-action border-top-0">
             Profile
         </a>
-        {% if user.role == '2' or user.is_superuser %}
+        {% if user.role == 'Premium' or user.is_superuser %}
             <a href="{% url 'siteweather:users_list' %}" class="list-group-item list-group-item-action border-top-0">
                 List of users
             </a>

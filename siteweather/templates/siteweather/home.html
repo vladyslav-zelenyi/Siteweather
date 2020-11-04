@@ -14,6 +14,14 @@
 {% endblock %}
 
 {% block content %}
+    {% if not cities %}
+        <div class="card card-body text-muted">
+            <strong>
+                Can not find any {{ request.GET.dict.city_name_filter|correct_name }} data for the <br>{{ request.GET.dict.date_filter }}
+            </strong>
+        </div>
+        <br>
+    {% endif %}
     {% for item in cities %}
         <div class="card mb-4">
             <div class="card-header">
