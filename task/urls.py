@@ -24,5 +24,3 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('siteweather.urls', namespace='weather')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-

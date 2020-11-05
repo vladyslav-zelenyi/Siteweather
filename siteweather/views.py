@@ -7,6 +7,7 @@ from datetime import datetime
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
+from django.template import RequestContext
 
 from task import settings
 from django.views import View
@@ -275,6 +276,12 @@ class DeleteCityBlock(UserPassesTestMixin, DetailView):
         block_to_delete.delete()
         logger.warning(f"{self.request.user} deleted city. ID = {self.kwargs['pk']}")
         return redirect('/')
+
+    # def handle_no_permission(self):
+    #     if self.request.user.is_authenticated:
+    #         raise PermissionError('Permission Denied')
+    #     else:
+    #         return redirect('siteweather:login')
 
     def test_func(self):
         block_to_delete = CityBlock.objects.get(pk=self.kwargs['pk'])

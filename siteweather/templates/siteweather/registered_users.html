@@ -17,14 +17,24 @@
 
 {% block content %}
     {% if not profile %}
-        <div class="card card-body text-muted">
-            <strong>
-                Can not find any user from {{ request.GET.dict.city_name_filter|correct_name }}
-                <br>
-                whose name starts with {{ request.GET.dict.first_name_filter|correct_name }} {{ request.GET.dict.last_name_filter|correct_name }}
-            </strong>
-        </div>
-        <br>
+        {% if user.is_authenticated %}
+            <div class="btn btn-block disabled btn-success">
+                <strong>
+                    Can not find any user
+                    {% if request.GET.dict.city_name_filter %}
+                        from {{ request.GET.dict.city_name_filter|correct_name }}
+                    {% endif %}
+                    {% if request.GET.dict.first_name_filter %}
+                        <br>
+                        whose name starts with {{ request.GET.dict.first_name_filter|correct_name }}
+                        {{ request.GET.dict.last_name_filter|correct_name }}
+                    {% elif request.GET.dict.last_name_filter|correct_name %}
+                        <br>
+                        whose surname starts with {{ request.GET.dict.last_name_filter|correct_name }}
+                    {% endif %}
+                </strong>
+            </div>
+        {% endif %}
     {% endif %}
     {% if user.role == 'Premium' or user.is_superuser %}
         <div class="list-group">
@@ -60,7 +70,7 @@
             <br>
         </form>
     {% else %}
-        <div class="alert alert-danger">
+        <div class="btn btn-block disabled btn-danger">
             <strong>
                 You are not authorized to view this page.
             </strong>

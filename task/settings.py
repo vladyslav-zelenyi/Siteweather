@@ -51,6 +51,8 @@ MIDDLEWARE = [
     'siteweather.middleware.TimezoneMiddleware',
 ]
 
+# CSRF_FAILURE_VIEW = 'siteweather.views.CSRFFailure'
+
 ROOT_URLCONF = 'task.urls'
 
 TEMPLATES = [
@@ -133,6 +135,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = 'login/'
 
 AUTH_USER_MODEL = 'siteweather.CustomUser'
 

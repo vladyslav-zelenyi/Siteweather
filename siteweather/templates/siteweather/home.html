@@ -17,7 +17,10 @@
     {% if not cities %}
         <div class="card card-body text-muted">
             <strong>
-                Can not find any {{ request.GET.dict.city_name_filter|correct_name }} data for the <br>{{ request.GET.dict.date_filter }}
+                Can not find any {{ request.GET.dict.city_name_filter|correct_name }} data
+                {% if request.GET.dict.date_filter %}
+                    for the <br>{{ request.GET.dict.date_filter }}
+                {% endif %}
             </strong>
         </div>
         <br>
