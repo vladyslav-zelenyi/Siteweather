@@ -64,7 +64,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-        {% if city_item.searched_by_user == request.user %}
+        {% if permission %}
             <div class="card-footer text-muted">
                 <a href="/siteweather/{{ city_item.id }}/delete_confirmation/">
                     Delete this block

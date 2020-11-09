@@ -7,7 +7,6 @@ from datetime import datetime
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
-from django.template import RequestContext
 
 from task import settings
 from django.views import View
@@ -100,6 +99,8 @@ class UserLogoutView(View):
     url = 'siteweather:home'
 
     def get(self, request, *args, **kwargs):
+        if self.request.user.is_anonymous:
+            return redirect('siteweather:login')
         timezone = request.session.get('django_timezone')
         logout(request)
         logger.info(f"{self.request.user.username} logged out")
@@ -260,6 +261,8 @@ class ViewCity(DetailView):
         context = super(ViewCity, self).get_context_data(**kwargs)
         if self.request.user.has_perm('siteweather.see_users'):
             context['CustomUser'] = CustomUser.objects.filter(user_city=context['object'])
+        if self.request.user.has_perm('siteweather.delete_cityblock') or self.request.user.is_superuser:
+            context['permission'] = True
         return context
 
 
@@ -277,15 +280,13 @@ class DeleteCityBlock(UserPassesTestMixin, DetailView):
         logger.warning(f"{self.request.user} deleted city. ID = {self.kwargs['pk']}")
         return redirect('/')
 
-    # def handle_no_permission(self):
-    #     if self.request.user.is_authenticated:
-    #         raise PermissionError('Permission Denied')
-    #     else:
-    #         return redirect('siteweather:login')
-
     def test_func(self):
         block_to_delete = CityBlock.objects.get(pk=self.kwargs['pk'])
-        return block_to_delete.searched_by_user == self.request.user
+        return block_to_delete.searched_by_user == self.request.user or self.request.user.has_perm('siteweather'
+                                                                                                   '.delete_cityblock')
+
+    def handle_no_permission(self):
+        return redirect('siteweather:login')
 
 
 class FindCity(View):

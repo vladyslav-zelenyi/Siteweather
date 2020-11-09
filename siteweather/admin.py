@@ -7,6 +7,9 @@ from .forms import GroupAdminForm
 from siteweather.models import CityBlock, CustomUser
 
 
+admin.site.unregister(Group)
+
+
 def make_premium(modeladmin, request, queryset):
     queryset.update(role='Premium')
 
@@ -37,7 +40,7 @@ class CustomUserAdmin(UserAdmin):
     )
     list_display_links = ('username',)
     search_fields = ('username',)
-    list_filter = ('date_joined', 'is_superuser',)
+    list_filter = ('date_joined', 'is_superuser', 'role')
     fieldsets = (
         (None, {'fields': ('username', 'password', 'role')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone_number', 'user_city')}),
@@ -50,8 +53,16 @@ class CustomUserAdmin(UserAdmin):
     radio_fields = {'role': admin.VERTICAL}
     actions = [make_premium, make_standard]
 
-
-admin.site.unregister(Group)
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if not request.user.is_superuser:
+            form.base_fields['is_staff'].disabled = True
+            form.base_fields['is_active'].disabled = True
+            form.base_fields['is_superuser'].disabled = True
+            form.base_fields['user_permissions'].disabled = True
+            form.base_fields['groups'].disabled = True
+            # form.
+        return form
 
 
 @admin.register(Group)

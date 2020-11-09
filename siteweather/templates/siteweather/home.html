@@ -39,7 +39,7 @@
                         <h6 class="card-text">{{ item.temperature }}°C</h6>
                         <h5 class="card-text">{{ item.weather_main_description }}
                         </h5>
-                        <a href="{{ item.get_absolute_url }}" class="btn btn-outline-success btn-block">Read
+                        <a href="{{ item.get_absolute_url }}" class="btn btn-outline-primary btn-block">Read
                             more</a>
                     </div>
                 </div>
@@ -60,7 +60,7 @@
             <input type="date" class="form-control" name="date_filter"
                    id="id_date_filter" value="{{ request.GET.dict.date_filter }}">
         </label>
-        <button type="submit" class="btn-outline-success btn btn-block">
+        <button type="submit" class="btn-outline-primary btn btn-block">
             Filter
         </button>
         <br>
