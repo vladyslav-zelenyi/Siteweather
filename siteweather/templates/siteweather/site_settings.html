@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
 
 {% block sidebar %}
-    {% include 'inc/_sidebar.html' %}
+  {% include 'inc/_sidebar.html' %}
 {% endblock %}
 
 {% block time %}
-    {% include 'inc/_time.html' %}
+  {% include 'inc/_time.html' %}
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post">
-        {% csrf_token %}
-        {% load tz %}
-        {% get_current_timezone as TIME_ZONE %}
-        <label for="timezone">
-            Time zone:
-            <select name="timezone" class="form-control">
-                {% for tz in timezones %}
-                    <option value="{{ tz }}" {% if tz == TIME_ZONE %}
-                            selected {% endif %}>{{ tz }}</option>
-                {% endfor %}
-            </select>
-            <br>
-            <button type="submit" class="btn-outline-success btn btn-block">
-                Set
-            </button>
-        </label>
-    </form>
+  <form action="" method="post">
+    {% csrf_token %}
+    {% load tz %}
+    {% get_current_timezone as TIME_ZONE %}
+    <label for="timezone">
+      Time zone:
+      <select name="timezone" class="form-control">
+        {% for tz in timezones %}
+          <option value="{{ tz }}" {% if tz == TIME_ZONE %}
+                  selected {% endif %}>{{ tz }}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <button type="submit" class="btn-outline-primary btn btn-block">
+        Set
+      </button>
+    </label>
+  </form>
 {% endblock %}

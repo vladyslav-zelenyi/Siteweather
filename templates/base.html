@@ -4,31 +4,31 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'bootstrap/css/style.css' %}">
-    <title> {% block title %} Weather_base_html {% endblock %}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'bootstrap/css/style.css' %}">
+  <title> {% block title %} Weather_base_html {% endblock %}</title>
 </head>
 <body>
 <div><br><br><br><br><br></div>
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            {% block content %}
-                <h1>Base</h1>
-            {% endblock %}
-        </div>
-        <div class="col-md-4">
-            {% block sidebar %}
-            {% endblock %}
-            {% block time %}
-            {% endblock %}
-            {% block pagination %}
-            {% endblock %}
-
-        </div>
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+      {% block content %}
+        <h1>Base</h1>
+      {% endblock %}
     </div>
+    <div class="col-md-4">
+      {% block sidebar %}
+      {% endblock %}
+      {% block time %}
+      {% endblock %}
+      {% block pagination %}
+      {% endblock %}
+
+    </div>
+  </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"

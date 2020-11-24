@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ user.first_name }} {{ user.last_name }}
+{% endblock %}
+
+{% block sidebar %}
+  {% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block pagination %}
+{% endblock %}
+
+{% block content %}
+  {% if request.user.is_authenticated %}
+    <div class="card mb-4">
+      <form action="" method="post" autocomplete="off" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card-header">
+          <h5>
+            <strong>
+              {{ user.first_name }} {{ user.last_name }}
+            </strong>
+          </h5>
+          {{ user.username }}
+        </div>
+        <div class="card-body">
+          <div class="media">
+            <div class="media-body">
+              <h6 class="card-text">
+                <label for="id_first_name">
+                  <h6>First name:</h6>
+                  <input type="text" class="form-control" name="first_name"
+                         value="{{ user.first_name }}" required="" id="id_first_name">
+                  {% if form.errors %}
+                    {% for error in form.first_name.errors %}
+                      <br>
+                      <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </label>
+                <label for="id_last_name">
+                  <h6>Last name:</h6>
+                  <input type="text" class="form-control" name="last_name"
+                         value="{{ user.last_name }}">
+                  {% if form.errors %}
+                    {% for error in form.last_name.errors %}
+                      <br>
+                      <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </label>
+                <label for="id_email">
+                  <h6>Email:</h6>
+                  <input type="text" class="form-control" name="email"
+                         value="{{ user.email }}">
+                  {% if form.errors %}
+                    {% for error in form.email.errors %}
+                      <br>
+                      <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </label>
+                <label for="id_city_name">
+                  <h6>City:</h6>
+                  <input type="text" class="form-control" name="city_name"
+                         value="{{ user.user_city }}">
+                  {% if form.errors %}
+                    {% for error in form.city_name.errors %}
+                      <br>
+                      <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </label>
+                <label for="id_phone_number">
+                  <h6>Phone number:</h6>
+                  <input type="text" class="form-control" name="phone_number"
+                         value="{{ user.phone_number }}">
+                  {% if form.errors %}
+                    {% for error in form.phone_number.errors %}
+                      <br>
+                      <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </label>
+                <label for="id_photo">
+                  <h6>Photo:</h6>
+                  {% if user.photo %}
+                    Currently: <img src="{{ user.photo.url }}" width=100% alt="Photo">
+                  {% endif %}
+                  <input type="checkbox" name="photo-clear" id="photo-clear_id">
+                  <label for="photo-clear_id">Clear</label><br>
+                  Change:
+                  <input type="file" name="photo" accept="image/*" id="id_photo">
+                  {% if form.errors %}
+                    {% for error in form.photo.errors %}
+                      <br>
+                      <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </label>
+              </h6>
+              <button type="submit" class="btn-outline-primary btn btn-block">
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="card-footer text-muted">
+        <strong>
+          <a href="{% url 'siteweather:password_update' %}">Change password</a>
+        </strong>
+      </div>
+    </div>
+  {% else %}
+    <div class="btn btn-block disabled btn-danger">
+      <strong>
+        You are not authorized to view this page.
+      </strong>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block time %}
+  {% include 'inc/_time.html' %}
+{% endblock %}

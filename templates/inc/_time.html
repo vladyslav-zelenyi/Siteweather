@@ -1,9 +1,9 @@
 <div class="card mb-4">
-    <div class="card-footer text-muted border-top-0">
-        {% now "l, \t\h\e jS \o\f F" %}
-        <br>
-        {% load tz %}
-        {% get_current_timezone as TIME_ZONE %}
-        {% now "H:i" %} | {{ TIME_ZONE }}
-    </div>
+  <div class="card-footer text-muted border-top-0">
+    {% now "l, \t\h\e jS \o\f F" %}
+    <br>
+    {% load tz %}
+    {% get_current_timezone as TIME_ZONE %}
+    {% now "H:i" %} | {{ TIME_ZONE }}
+  </div>
 </div>

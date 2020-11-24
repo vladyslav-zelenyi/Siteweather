@@ -2,71 +2,70 @@
 {% load siteweather_extras %}
 
 {% block title %}
-    Home
+  Home
 {% endblock %}
 
 {% block sidebar %}
-    {% include 'inc/_sidebar.html' %}
+  {% include 'inc/_sidebar.html' %}
 {% endblock %}
 
 {% block pagination %}
-    {% include 'inc/_pagination.html' %}
+  {% include 'inc/_pagination.html' %}
 {% endblock %}
 
 {% block content %}
-    {% if not cities %}
-        <div class="card card-body text-muted">
-            <strong>
-                Can not find any {{ request.GET.dict.city_name_filter|correct_name }} data
-                {% if request.GET.dict.date_filter %}
-                    for the <br>{{ request.GET.dict.date_filter }}
-                {% endif %}
-            </strong>
+  {% if not cities %}
+    <div class="card card-body text-muted">
+      <strong>
+        Can not find any {{ request.GET.dict.city_name_filter|correct_name }} data
+        {% if request.GET.dict.date_filter %}
+          for the <br>{{ request.GET.dict.date_filter }}
+        {% endif %}
+      </strong>
+    </div>
+    <br>
+  {% endif %}
+  {% for item in cities %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5>
+          {{ item.city_name }} | {{ item.country }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="media">
+          <img src="https://openweathermap.org/img/w/{{ item.weather_icon }}.png" alt="icon">
+          <div class="media-body">
+            <h6 class="card-text">{{ item.temperature }}°C</h6>
+            <h5 class="card-text">{{ item.weather_main_description }}
+            </h5>
+            <a href="{{ item.get_absolute_url }}" class="btn btn-outline-primary btn-block">Read more</a>
+          </div>
         </div>
-        <br>
-    {% endif %}
-    {% for item in cities %}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>
-                    {{ item.city_name }} | {{ item.country }}
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="media">
-                    <img src="https://openweathermap.org/img/w/{{ item.weather_icon }}.png" alt="icon">
-                    <div class="media-body">
-                        <h6 class="card-text">{{ item.temperature }}°C</h6>
-                        <h5 class="card-text">{{ item.weather_main_description }}
-                        </h5>
-                        <a href="{{ item.get_absolute_url }}" class="btn btn-outline-primary btn-block">Read
-                            more</a>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer text-muted">
-                {{ item.timestamp|date:'Y-m-d | H:i:s' }}
-            </div>
-        </div>
-    {% endfor %}
-    <form action="{% url 'siteweather:home' %}" method="get" autocomplete="off">
-        <label for="id_city_name_filter">
-            City:
-            <input type="search" class="form-control" name="city_name_filter"
-                   id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter|correct_name }}">
-        </label>
-        <label for="id_date_filter">
-            Date:
-            <input type="date" class="form-control" name="date_filter"
-                   id="id_date_filter" value="{{ request.GET.dict.date_filter }}">
-        </label>
-        <button type="submit" class="btn-outline-primary btn btn-block">
-            Filter
-        </button>
-        <br>
-    </form>
+      </div>
+      <div class="card-footer text-muted">
+        {{ item.timestamp|date:'Y-m-d | H:i:s' }}
+      </div>
+    </div>
+  {% endfor %}
+  <form action="{% url 'siteweather:home' %}" method="get" autocomplete="off">
+    <label for="id_city_name_filter">
+      City:
+      <input type="search" class="form-control" name="city_name_filter"
+             id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter|correct_name }}">
+    </label>
+    <label for="id_date_filter">
+      Date:
+      <input type="date" class="form-control" name="date_filter"
+             id="id_date_filter" value="{{ request.GET.dict.date_filter }}">
+    </label>
+    <button type="submit" class="btn-outline-primary btn btn-block">
+      Filter
+    </button>
+    <br>
+  </form>
 {% endblock %}
 
 {% block time %}
-    {% include 'inc/_time.html' %}
+  {% include 'inc/_time.html' %}
 {% endblock %}

@@ -126,7 +126,7 @@ class UserProfileUpdate(UpdateView):
     model = CustomUser
     context_object_name = 'profile'
     form_class = UserUpdateForm
-    template_name = 'registration/update.html'
+    template_name = 'registration/profile_update.html'
 
     def get(self, request, *args, **kwargs):
         form = self.form_class(request.user)
