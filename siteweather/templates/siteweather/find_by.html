@@ -11,7 +11,7 @@
 {% block pagination %}
   {% ifnotequal request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" request.get_full_path %}
     {% if request.META.HTTP_REFERER is not None %}
-      <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-success btn-block">
+      <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-primary btn-block">
         Previous page
       </a>
     {% endif %}
@@ -25,7 +25,7 @@
       <div class="card-header">
         <div class="form-group">
           <label for="{{ form.city_name.id_for_label }}">
-              City name:
+            City name:
           </label>
           {{ form.city_name }}
           {% if form.errors %}
@@ -38,7 +38,7 @@
           {% endif %}
         </div>
         <button type="submit" class="btn-outline-primary btn btn-block">
-            Find
+          Find
         </button>
       </div>
     </div>

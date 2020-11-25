@@ -57,9 +57,9 @@
         Users from {{ city_item.city_name }}: <br>
         {% for profile in CustomUser %}
           {% if not forloop.last %}
-            <a href="{% url 'siteweather:profile' profile.id %}">{{ profile.first_name }} {{ profile.last_name }}</a>,
+            <a href="{% url 'siteweather:profile:profile' profile.id %}">{{ profile.first_name }} {{ profile.last_name }}</a>,
           {% else %}
-            <a href="{% url 'siteweather:profile' profile.id %}">{{ profile.first_name }} {{ profile.last_name }}</a>
+            <a href="{% url 'siteweather:profile:profile' profile.id %}">{{ profile.first_name }} {{ profile.last_name }}</a>
           {% endif %}
         {% endfor %}
       </div>

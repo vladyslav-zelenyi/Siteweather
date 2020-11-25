@@ -96,7 +96,7 @@
                 <label for="id_photo">
                   <h6>Photo:</h6>
                   {% if user.photo %}
-                    Currently: <img src="{{ user.photo.url }}" width=100% alt="Photo">
+                    currently: <img src="{{ user.photo.url }}" width=100% alt="Photo" class="img-thumbnail">
                   {% endif %}
                   <input type="checkbox" name="photo-clear" id="photo-clear_id">
                   <label for="photo-clear_id">Clear</label><br>
@@ -121,7 +121,7 @@
       </form>
       <div class="card-footer text-muted">
         <strong>
-          <a href="{% url 'siteweather:password_update' %}">Change password</a>
+          <a href="{% url 'siteweather:profile:password_update' %}">Change password</a>
         </strong>
       </div>
     </div>
