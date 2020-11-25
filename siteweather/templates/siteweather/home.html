@@ -17,7 +17,8 @@
   {% if not cities %}
     <div class="card card-body text-muted">
       <strong>
-        Can not find any {{ request.GET.dict.city_name_filter|correct_name }} data
+        Can not find any {{ request.GET.dict.city_name_filter|correct_name }} data. <br>
+        Try to search by city name.
         {% if request.GET.dict.date_filter %}
           for the <br>{{ request.GET.dict.date_filter }}
         {% endif %}
@@ -39,7 +40,7 @@
             <h6 class="card-text">{{ item.temperature }}°C</h6>
             <h5 class="card-text">{{ item.weather_main_description }}
             </h5>
-            <a href="{{ item.get_absolute_url }}" class="btn btn-outline-primary btn-block">Read more</a>
+            <a href="{% url 'siteweather:view_city' item.pk %}" class="btn btn-outline-primary btn-block">Read more</a>
           </div>
         </div>
       </div>
@@ -48,22 +49,28 @@
       </div>
     </div>
   {% endfor %}
-  <form action="{% url 'siteweather:home' %}" method="get" autocomplete="off">
-    <label for="id_city_name_filter">
-      City:
-      <input type="search" class="form-control" name="city_name_filter"
-             id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter|correct_name }}">
-    </label>
-    <label for="id_date_filter">
-      Date:
-      <input type="date" class="form-control" name="date_filter"
-             id="id_date_filter" value="{{ request.GET.dict.date_filter }}">
-    </label>
-    <button type="submit" class="btn-outline-primary btn btn-block">
+  <div class="card card-header">
+    <div class="text-muted">
       Filter
-    </button>
-    <br>
-  </form>
+    </div>
+    <form action="{% url 'siteweather:home' %}" method="get" autocomplete="off">
+      <label for="id_city_name_filter">
+        City:
+        <input type="search" class="form-control" name="city_name_filter"
+               id="id_city_name_filter" value="{{ request.GET.dict.city_name_filter|correct_name }}">
+      </label>
+      <label for="id_date_filter">
+        Date:
+        <input type="date" class="form-control" name="date_filter"
+               id="id_date_filter" value="{{ request.GET.dict.date_filter }}">
+      </label>
+      <button type="submit" class="btn-outline-primary btn btn-block">
+        Filter
+      </button>
+      <br>
+    </form>
+  </div>
+
 {% endblock %}
 
 {% block time %}

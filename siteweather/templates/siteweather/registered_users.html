@@ -39,7 +39,7 @@
   {% if user.role == 'Premium' or user.is_superuser %}
     <div class="list-group">
       {% for person in profile %}
-        <a href="{% url 'siteweather:profile' person.pk %}" class="list-group-item-action list-group-item">
+        <a href="{% url 'siteweather:profile:profile' person.pk %}" class="list-group-item-action list-group-item">
           {{ person.first_name }} {{ person.last_name }}
           {% if person.user_city %}
             | {{ person.user_city }}

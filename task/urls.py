@@ -2,7 +2,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from task import settings
-from siteweather.views import AdminLogoutView
+from siteweather.authentication.views import AdminLogoutView
 
 urlpatterns = [
     path('admin/logout/', AdminLogoutView.as_view()),

@@ -1,157 +1,18 @@
-import pytz
 import logging
-import requests
-
 from datetime import datetime
 
+import pytz
+import requests
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth.models import Group
-from django.contrib.auth.views import LoginView
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView
+from django.views.generic.base import View
 
 from task import settings
-from django.views import View
-from django.core.mail import send_mail
-from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, UpdateView
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-
+from .forms import CityBlockForm
 from .models import CityBlock, CustomUser
-from .forms import CityBlockForm, UserRegisterForm, UserLoginForm, UserUpdateForm, UserUpdatePasswordForm
 
 logger = logging.getLogger('django')
-
-
-class RegisterFormView(View):
-    form_class = UserRegisterForm
-    template_name = 'registration/registration.html'
-
-    def get(self, request, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect('siteweather:profile', pk=self.request.user.pk)
-        form = self.form_class(request.user)
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.user, request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            email = form.cleaned_data['email']
-            phone_number = form.cleaned_data['phone_number']
-            user_city = form.cleaned_data['city_name']
-            user = CustomUser.objects.create_user(
-                username=username,
-                password=password,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                phone_number=phone_number,
-                user_city=user_city,
-                role='Standard',
-            )
-            group = Group.objects.get(name='Registered')
-            user.groups.add(group)
-            permissions = group.permissions.all()
-            user.user_permissions.set(permissions)
-            login(request, user)
-            message = 'You have successfully registered on the site'
-            logger.info(f"{username} was registered and authorized")
-            send_mail(
-                subject='Registration',
-                from_email='Siteweather',
-                message=message,
-                recipient_list=[email]
-            )
-            return redirect('siteweather:profile', pk=user.pk)
-        return render(request, self.template_name, {'form': form})
-
-
-class UserLoginFormView(LoginView):
-    form_class = UserLoginForm
-    template_name = 'registration/login.html'
-
-    def get(self, request, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect('siteweather:profile', pk=self.request.user.pk)
-        form = self.form_class(request.user)
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.user, request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                user = CustomUser.objects.get(username=username)
-                logger.info(f"{username} was authorized")
-                return redirect('weather:profile', pk=user.id)
-        else:
-            if CustomUser.objects.filter(username=form.cleaned_data['username']):
-                logger.warning(f"Unsuccessful authorization into {form.cleaned_data['username']}")
-        return render(request, 'registration/login.html', {'form': form})
-
-
-class UserLogoutView(View):
-    url = 'siteweather:home'
-
-    def get(self, request, *args, **kwargs):
-        if self.request.user.is_anonymous:
-            return redirect('siteweather:login')
-        timezone = request.session.get('django_timezone')
-        logout(request)
-        logger.info(f"{self.request.user.username} logged out")
-        request.session['django_timezone'] = timezone
-        return redirect(self.url)
-
-
-class AdminLogoutView(UserLogoutView):
-    url = '/admin/'
-
-
-class UserProfile(DetailView):
-    model = CustomUser
-    context_object_name = 'profile'
-    template_name = 'registration/profile.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(UserProfile, self).get_context_data(**kwargs)
-        return context
-
-
-class UserProfileUpdate(UpdateView):
-    model = CustomUser
-    context_object_name = 'profile'
-    form_class = UserUpdateForm
-    template_name = 'registration/profile_update.html'
-
-    def get(self, request, *args, **kwargs):
-        form = self.form_class(request.user)
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.user, request.POST, request.FILES)
-        if form.is_valid():
-            user = request.user
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.email = form.cleaned_data['email']
-            user.phone_number = form.cleaned_data['phone_number']
-            user.user_city = form.cleaned_data['city_name']
-            check = request.POST.get('photo-clear')
-            if check == 'on':
-                user.photo = None
-            if check is None and form.cleaned_data['photo'] is None:
-                pass
-            else:
-                user.photo = form.cleaned_data['photo']
-            user.save()
-            logger.info(f"{user} updated his profile")
-            return redirect('siteweather:profile', pk=user.pk)
-        return render(request, self.template_name, {'form': form})
 
 
 class PersonalSiteSettings(View):
@@ -162,39 +23,7 @@ class PersonalSiteSettings(View):
 
     def post(self, request, *args, **kwargs):
         request.session['django_timezone'] = request.POST['timezone']
-        return redirect('/')
-
-
-class UserPasswordUpdate(UpdateView):
-    model = CustomUser
-    context_object_name = 'profile'
-    form_class = UserUpdatePasswordForm
-    template_name = 'registration/password_update.html'
-
-    def get(self, request, *args, **kwargs):
-        form = self.form_class(request.user)
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.user, request.POST)
-        if form.is_valid():
-            user = request.user
-            user.set_password(form.cleaned_data['password'])
-            password = form.cleaned_data['password']
-            user.save()
-            logger.warning(f'{user} updated his password')
-            default_zone = settings.TIME_ZONE
-            current_timezone = pytz.timezone(request.session.get('django_timezone', default_zone))
-            time = datetime.now().astimezone(current_timezone)
-            time = f'{time.year}-{time.month}-{time.day} | {time.hour}:{time.minute}:{time.second}'
-            send_mail(
-                subject='Password change',
-                from_email='Siteweather',
-                message=f"Your password has been changed to '{password}'. Time - {time}",
-                recipient_list=[user.email])
-            update_session_auth_hash(request, form.user)
-            return redirect('siteweather:home')
-        return render(request, self.template_name, {'form': form})
+        return redirect('siteweather:home')
 
 
 class UsersList(ListView):
@@ -294,11 +123,11 @@ class FindCity(View):
     template_name = 'siteweather/find_by.html'
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class()
+        form = self.form_class(request.user)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.user, request.POST)
         if form.is_valid():
             city_name = form.cleaned_data['city_name'].title()
             url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'

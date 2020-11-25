@@ -61,7 +61,6 @@ class CustomUserAdmin(UserAdmin):
             form.base_fields['is_superuser'].disabled = True
             form.base_fields['user_permissions'].disabled = True
             form.base_fields['groups'].disabled = True
-            # form.
         return form
 
 
