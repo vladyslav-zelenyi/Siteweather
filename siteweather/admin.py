@@ -44,24 +44,29 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password', 'role')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone_number', 'user_city')}),
-        ('Permissions', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
-        }),
+
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
+    superuser_fieldsets = ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
     list_per_page = 12
     radio_fields = {'role': admin.VERTICAL}
     actions = [make_premium, make_standard]
 
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if not request.user.is_superuser:
-            form.base_fields['is_staff'].disabled = True
-            form.base_fields['is_active'].disabled = True
-            form.base_fields['is_superuser'].disabled = True
-            form.base_fields['user_permissions'].disabled = True
-            form.base_fields['groups'].disabled = True
-        return form
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        if obj:
+            if request.user.is_superuser:
+                fields_to_remove = ['user_permissions', 'groups', 'is_superuser', ]
+                for field in fields_to_remove:
+                    fields.remove(field)
+        return fields
+
+    def get_fieldsets(self, request, obj=None):
+        if request.user.is_superuser:
+            return (self.fieldsets or tuple()) + self.superuser_fieldsets
+        return super().get_fieldsets(request, obj)
 
 
 @admin.register(Group)
