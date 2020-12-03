@@ -7,10 +7,15 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
+from rest_framework.generics import RetrieveAPIView, ListAPIView, CreateAPIView
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from task import settings
 from .forms import CityBlockForm
 from .models import CityBlock, CustomUser
+from .serializers import CityBlockSerializer, CustomUserSerializer
 
 logger = logging.getLogger('django')
 
@@ -52,17 +57,66 @@ class UsersList(ListView):
             return CustomUser.objects.filter(username=self.request.user.username)
 
 
-class Home(ListView):
-    model = CityBlock
+# class Home(ListView):
+#     model = CityBlock
+#     template_name = 'siteweather/home.html'
+#     context_object_name = 'cities'
+#     paginate_by = 2
+#
+#     def get_context_data(self, *, object_list=None, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         return context
+
+    # def queryset_filter(self):
+    #     city = self.request.GET.get('city_name_filter')
+    #     date = self.request.GET.get('date_filter')
+    #     if self.request.user.is_anonymous:
+    #         result = CityBlock.objects.all()
+    #     else:
+    #         result = CityBlock.objects.filter(searched_by_user=self.request.user)
+    #     if city != '' and city is not None and not city.isspace():
+    #         city = str(city).casefold().title().strip()
+    #         result = result.filter(city_name__startswith=city)
+    #     if date != '' and city is not None:
+    #         date_res = datetime.strptime(date, '%Y-%m-%d')
+    #         result = result.filter(
+    #             timestamp__year=date_res.year,
+    #             timestamp__month=date_res.month,
+    #             timestamp__day=date_res.day
+    #         )
+    #     return result
+
+
+class Home(ListAPIView):
+    serializer_class = CityBlockSerializer
+    queryset = CityBlock.objects.all()
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     template_name = 'siteweather/home.html'
-    context_object_name = 'cities'
-    paginate_by = 2
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+    # def get(self, request, *args, **kwargs):
+    #     cities = self.get_serializer(self.get_queryset(), many=True).data
+    #     return Response({'cities': cities}, template_name=self.template_name)
 
-    def get_queryset(self):
+    # def queryset_filter(self):
+    #     city = self.request.GET.get('city_name_filter')
+    #     date = self.request.GET.get('date_filter')
+    #     if self.request.user.is_anonymous:
+    #         serialized = self.get_serializer(self.queryset, many=True).data
+    #     else:
+    #         serialized = self.queryset.filter(searched_by_user=self.request.user)
+    #     if city != '' and city is not None and not city.isspace():
+    #         city = str(city).casefold().title().strip()
+    #         serialized = serialized.filter(city_name__startswith=city)
+    #     if date != '' and city is not None:
+    #         date_res = datetime.strptime(date, '%Y-%m-%d')
+    #         serialized = serialized.filter(
+    #             timestamp__year=date_res.year,
+    #             timestamp__month=date_res.month,
+    #             timestamp__day=date_res.day
+    #         )
+    #     return serialized
+
+    def queryset_filter(self):
         city = self.request.GET.get('city_name_filter')
         date = self.request.GET.get('date_filter')
         if self.request.user.is_anonymous:
@@ -81,18 +135,34 @@ class Home(ListView):
             )
         return result
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.queryset_filter()
+        page = self.paginate_queryset(queryset)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
+        #     return Response({'cities': serializer.data}, template_name=self.template_name)
 
-class ViewCity(DetailView):
-    model = CityBlock
-    context_object_name = 'city_item'
+        serializer = self.get_serializer(page, many=True)
+        return Response({'cities': serializer.data}, template_name=self.template_name)
 
-    def get_context_data(self, **kwargs):
-        context = super(ViewCity, self).get_context_data(**kwargs)
+
+class ViewCity(RetrieveAPIView):
+    serializer_class = CityBlockSerializer
+    queryset = CityBlock.objects.all()
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
+    template_name = 'siteweather/cityblock_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        city_item = self.get_object()
+        serialized = self.get_serializer(city_item).data
         if self.request.user.has_perm('siteweather.see_users'):
-            context['CustomUser'] = CustomUser.objects.filter(user_city=context['object'])
-        if self.request.user.has_perm('siteweather.delete_cityblock') or self.request.user.is_superuser:
-            context['permission'] = True
-        return context
+            users = CustomUser.objects.filter(user_city=self.request.user.user_city)
+            user_serializer = CustomUserSerializer(users, many=True).data
+            serialized['customers'] = user_serializer
+        if serialized['searched_by_user'] == request.user.pk or self.request.user.is_superuser:
+            serialized['permission'] = True
+        return Response({'city_item': serialized}, template_name=self.template_name)
 
 
 class DeleteCityBlock(UserPassesTestMixin, DetailView):
@@ -111,11 +181,10 @@ class DeleteCityBlock(UserPassesTestMixin, DetailView):
 
     def test_func(self):
         block_to_delete = CityBlock.objects.get(pk=self.kwargs['pk'])
-        return block_to_delete.searched_by_user == self.request.user or self.request.user.has_perm('siteweather'
-                                                                                                   '.delete_cityblock')
+        return block_to_delete.searched_by_user == self.request.user or self.request.user.is_superuser
 
     def handle_no_permission(self):
-        return redirect('siteweather:login')
+        return render(request=self.request, template_name='403.html')
 
 
 class FindCity(View):

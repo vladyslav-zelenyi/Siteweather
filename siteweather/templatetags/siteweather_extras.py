@@ -1,6 +1,9 @@
+import datetime
+
 from django import template
 
 from siteweather.models import CustomUser, CityBlock
+from dateutil.parser import parse
 
 register = template.Library()
 
@@ -21,3 +24,8 @@ def last_registered_users(count):
 def correct_name(city_name):
     city_name = str(city_name).casefold().title().strip()
     return city_name
+
+
+@register.filter
+def parse_time(time):
+    return parse(time)

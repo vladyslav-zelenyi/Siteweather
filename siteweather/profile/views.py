@@ -5,23 +5,30 @@ import pytz
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import UpdateView
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.response import Response
+
 
 from siteweather.forms import UserUpdateForm, UserUpdatePasswordForm
 from siteweather.models import CustomUser
+from siteweather.serializers import CustomUserSerializer
 from task import settings
 
 logger = logging.getLogger('django')
 
 
-class UserProfile(DetailView):
-    model = CustomUser
-    context_object_name = 'profile'
+class UserProfile(RetrieveAPIView):
+    serializer_class = CustomUserSerializer
+    queryset = CustomUser.objects.all()
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     template_name = 'profile/profile.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(UserProfile, self).get_context_data(**kwargs)
-        return context
+    def get(self, request, *args, **kwargs):
+        profile = self.get_object()
+        serialized = self.get_serializer(profile).data
+        return Response({'profile': serialized}, template_name='profile/profile.html')
 
 
 class UserProfileUpdate(UpdateView):

@@ -27,7 +27,7 @@
         {{ city_item.city_name }} | {{ city_item.country }}
       </h5>
     </div>
-    {% searched_counter city_item request as counter %}
+    {% searched_counter city_item.city_name request as counter %}
     {% for i in counter.values %}
       {% if not user.is_anonymous %}
         <div class="card-header">
@@ -50,23 +50,27 @@
       </div>
     </div>
     <div class="card-footer text-muted">
-      {{ city_item.timestamp|date:'Y-m-d | H:i:s' }}
+      {{ city_item.timestamp|parse_time|date:'Y-m-d | H:i:s' }}
     </div>
-    {% if CustomUser %}
+    {% if city_item.customers %}
       <div class="card-footer text-muted">
         Users from {{ city_item.city_name }}: <br>
-        {% for profile in CustomUser %}
+        {% for profile in city_item.customers %}
           {% if not forloop.last %}
-            <a href="{% url 'siteweather:profile:profile' profile.id %}">{{ profile.first_name }} {{ profile.last_name }}</a>,
+            <a href="{% url 'siteweather:profile:profile' profile.pk %}">
+              {{ profile.first_name }} {{ profile.last_name }}
+            </a>,
           {% else %}
-            <a href="{% url 'siteweather:profile:profile' profile.id %}">{{ profile.first_name }} {{ profile.last_name }}</a>
+            <a href="{% url 'siteweather:profile:profile' profile.pk %}">
+              {{ profile.first_name }} {{ profile.last_name }}
+            </a>
           {% endif %}
         {% endfor %}
       </div>
     {% endif %}
-    {% if permission %}
+    {% if city_item.permission %}
       <div class="card-footer text-muted">
-        <a href="{% url 'siteweather:delete_confirmation' city_item.id %}">
+        <a href="{% url 'siteweather:delete_confirmation' city_item.pk %}">
           Delete this block
         </a>
       </div>

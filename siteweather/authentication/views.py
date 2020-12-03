@@ -65,7 +65,7 @@ class UserLoginFormView(LoginView):
 
     def get(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('siteweather:profile', pk=self.request.user.pk)
+            return redirect('siteweather:profile:profile', pk=self.request.user.pk)
         form = self.form_class(request.user)
         return render(request, self.template_name, {'form': form})
 
