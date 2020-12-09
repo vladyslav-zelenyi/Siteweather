@@ -32,8 +32,8 @@
                   <h6>First name:</h6>
                   <input type="text" class="form-control" name="first_name"
                          value="{{ user.first_name }}" required="" id="id_first_name">
-                  {% if form.errors %}
-                    {% for error in form.first_name.errors %}
+                  {% if errors %}
+                    {% for error in errors.first_name %}
                       <br>
                       <div class="alert alert-danger">
                         <strong>{{ error|escape }}</strong>
@@ -45,8 +45,8 @@
                   <h6>Last name:</h6>
                   <input type="text" class="form-control" name="last_name"
                          value="{{ user.last_name }}">
-                  {% if form.errors %}
-                    {% for error in form.last_name.errors %}
+                  {% if errors %}
+                    {% for error in errors.last_name %}
                       <br>
                       <div class="alert alert-danger">
                         <strong>{{ error|escape }}</strong>
@@ -58,8 +58,8 @@
                   <h6>Email:</h6>
                   <input type="text" class="form-control" name="email"
                          value="{{ user.email }}">
-                  {% if form.errors %}
-                    {% for error in form.email.errors %}
+                  {% if errors %}
+                    {% for error in errors.email %}
                       <br>
                       <div class="alert alert-danger">
                         <strong>{{ error|escape }}</strong>
@@ -67,12 +67,12 @@
                     {% endfor %}
                   {% endif %}
                 </label>
-                <label for="id_city_name">
+                <label for="id_user_city">
                   <h6>City:</h6>
-                  <input type="text" class="form-control" name="city_name"
+                  <input type="text" class="form-control" name="user_city"
                          value="{{ user.user_city }}">
-                  {% if form.errors %}
-                    {% for error in form.city_name.errors %}
+                  {% if errors %}
+                    {% for error in errors.user_city %}
                       <br>
                       <div class="alert alert-danger">
                         <strong>{{ error|escape }}</strong>
@@ -84,8 +84,8 @@
                   <h6>Phone number:</h6>
                   <input type="text" class="form-control" name="phone_number"
                          value="{{ user.phone_number }}">
-                  {% if form.errors %}
-                    {% for error in form.phone_number.errors %}
+                  {% if errors %}
+                    {% for error in errors.phone_number %}
                       <br>
                       <div class="alert alert-danger">
                         <strong>{{ error|escape }}</strong>
@@ -102,8 +102,8 @@
                   <label for="photo-clear_id">Clear</label><br>
                   Change:
                   <input type="file" name="photo" accept="image/*" id="id_photo">
-                  {% if form.errors %}
-                    {% for error in form.photo.errors %}
+                  {% if errors %}
+                    {% for error in errors.photo %}
                       <br>
                       <div class="alert alert-danger">
                         <strong>{{ error|escape }}</strong>

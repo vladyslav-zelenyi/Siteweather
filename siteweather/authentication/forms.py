@@ -17,7 +17,7 @@ class BaseCustomUserForm(forms.Form):
         attrs={'class': 'form-control'}), required=True)
     phone_number = forms.CharField(label='phone_number', max_length=15, widget=forms.TextInput(
         attrs={'class': 'form-control'}), required=False)
-    city_name = forms.CharField(max_length=300, label='City name', widget=forms.TextInput(
+    user_city = forms.CharField(max_length=300, label='user_city', widget=forms.TextInput(
         attrs={'class': 'form-control'}))
 
     def __init__(self, user, *args, **kwargs):
@@ -60,13 +60,13 @@ class BaseCustomUserForm(forms.Form):
                 self.add_error('email', 'User with entered email exists')
         return email
 
-    def clean_city_name(self):
-        city_name = self.cleaned_data['city_name']
-        url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'
+    def clean_user_city(self):
+        user_city = self.cleaned_data['user_city']
+        url = f'{settings.SITE_WEATHER_URL}?q={user_city}&appid={settings.APP_ID}&units=metric'
         r = requests.get(url).json()
         if r['cod'] == '404':
-            self.add_error('city_name', f'City was not found')
-        return city_name
+            self.add_error('user_city', f'City was not found')
+        return user_city
 
 
 class UserRegisterForm(BaseCustomUserForm):
@@ -101,7 +101,7 @@ class UserLoginForm(UserRegisterForm):
     phone_number = None
     first_name = None
     last_name = None
-    city_name = None
+    user_city = None
 
     def clean_username(self):
         return self.cleaned_data['username']

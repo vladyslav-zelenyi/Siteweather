@@ -1,62 +1,17 @@
 <nav aria-label="...">
   <ul class="pagination">
-    {% if page_obj.has_previous %}
+    {% if previous %}
       <li class="page-item">
-        {% if 'city_name_filter' in request.get_full_path %}
-          <a class="page-link"
-             href="?city_name_filter={{ request.GET.dict.city_name_filter }}&first_name_filter={{ request.GET.dict.first_name_filter }}&last_name_filter={{ request.GET.dict.last_name_filter }}&page={{ page_obj.previous_page_number }}">
-            Previous
-          </a>
-        {% else %}
-          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-            Previous
-          </a>
-        {% endif %}
+        <a class="page-link" href="{{ previous }}">
+          ‹‹
+        </a>
       </li>
     {% endif %}
-
-    {% for p in page_obj.paginator.page_range %}
-
-      {% if page_obj.number == p %}
-        <li class="page-item active" aria-current="page">
-          {% if 'city_name_filter' in request.get_full_path %}
-            <a class="page-link"
-               href="?city_name_filter={{ request.GET.dict.city_name_filter }}&first_name_filter={{ request.GET.dict.first_name_filter }}&last_name_filter={{ request.GET.dict.last_name_filter }}&page={{ p }}">
-              {{ p }}
-            </a>
-          {% else %}
-            <a class="page-link" href="?page={{ p }}">
-              {{ p }} <span class="sr-only">(current)</span>
-            </a>
-          {% endif %}
-        </li>
-      {% elif p > page_obj.number|add:-3 and p < page_obj.number|add:3 %}
-        <li class="page-item">
-          {% if 'city_name_filter' in request.get_full_path %}
-            <a class="page-link"
-               href="?city_name_filter={{ request.GET.dict.city_name_filter }}&first_name_filter={{ request.GET.dict.first_name_filter }}&last_name_filter={{ request.GET.dict.last_name_filter }}&page={{ p }}">
-              {{ p }}
-            </a>
-          {% else %}
-            <a class="page-link" href="?page={{ p }}">
-              {{ p }}
-            </a>
-          {% endif %}
-        </li>
-      {% endif %}
-    {% endfor %}
-    {% if page_obj.has_next %}
+    {% if next %}
       <li class="page-item">
-        {% if 'city_name_filter' in request.get_full_path %}
-          <a class="page-link"
-             href="?city_name_filter={{ request.GET.dict.city_name_filter }}&first_name_filter={{ request.GET.dict.first_name_filter }}&last_name_filter={{ request.GET.dict.last_name_filter }}&page={{ page_obj.next_page_number }}">
-            Next
-          </a>
-        {% else %}
-          <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-            Next
-          </a>
-        {% endif %}
+        <a class="page-link" href="{{ next }}">
+          ››
+        </a>
       </li>
     {% endif %}
   </ul>
