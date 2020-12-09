@@ -158,7 +158,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'siteweather/profile.html'
 LOGIN_URL = 'login/'
 
 AUTH_USER_MODEL = 'siteweather.CustomUser'

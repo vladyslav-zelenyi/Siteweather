@@ -20,8 +20,8 @@
           <label for="{{ form.username.id_for_label }}">
             <h6>Username:</h6>
             {{ form.username }} <br>
-            {% if form.username.errors %}
-              {% for error in form.username.errors %}
+            {% if errors %}
+              {% for error in errors.username %}
                 <div class="alert alert-danger">
                   <strong>{{ error|escape }}</strong>
                 </div>
@@ -30,11 +30,10 @@
           </label>
           <label for="{{ form.password.id_for_label }}">
             <h6>Password:</h6>
-
             {{ form.password }}
-            {% if form.password.errors %}
+            {% if errors %}
               <br>
-              {% for error in form.password.errors %}
+              {% for error in errors.password %}
                 <div class="alert alert-danger">
                   <strong>{{ error|escape }}</strong>
                 </div>

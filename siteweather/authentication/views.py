@@ -3,85 +3,66 @@ import logging
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
-from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.views.generic.base import View
-from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import status, permissions, serializers
+from rest_framework.generics import CreateAPIView, GenericAPIView
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from siteweather.authentication.forms import *
-from siteweather.serializers import RegistrationSerializer
+from siteweather.serializers import RegistrationSerializer, LoginSerializer, CustomUserSerializer
 
 logger = logging.getLogger('django')
 
 
 class RegisterFormView(CreateAPIView):
     serializer_class = RegistrationSerializer
+    template_name = 'authentication/registration.html'
+    form_class = UserRegisterForm
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
+    parser_classes = (MultiPartParser, FormParser)
+    pagination_class = None
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('siteweather:profile:profile', pk=self.request.user.pk)
+        form = self.form_class(request.user)
+        # return Response({'form': form}, template_name=self.template_name)
+        return render(request, self.template_name, {'form': form})
+        # There is a problem in swagger when user is not authenticated and tries API
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return redirect('siteweather:profile:profile', pk=self.request.user.pk)
+        else:
+            return Response({
+                'errors': serializer.errors,
+                'form': self.form_class(request.user)
+                # todo: Form destroys API response
+            }, template_name=self.template_name, status=status.HTTP_406_NOT_ACCEPTABLE)
 
     def perform_create(self, serializer):
         user = CustomUser.objects.create_user(**serializer.data, role='Standard')
         group = Group.objects.get(name='Registered')
         user.groups.add(group)
-        permissions = group.permissions.all()
-        user.user_permissions.set(permissions)
-
-# class RegisterFormView(View):
-#     form_class = UserRegisterForm
-#     template_name = 'authentication/registration.html'
-#
-#     def get(self, request, *args, **kwargs):
-#         if self.request.user.is_authenticated:
-#             return redirect('siteweather:profile', pk=self.request.user.pk)
-#         form = self.form_class(request.user)
-#         return render(request, self.template_name, {'form': form})
-#
-#     def post(self, request, *args, **kwargs):
-#         form = self.form_class(request.user, request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data['username']
-#             password = form.cleaned_data['password']
-#             first_name = form.cleaned_data['first_name']
-#             last_name = form.cleaned_data['last_name']
-#             email = form.cleaned_data['email']
-#             phone_number = form.cleaned_data['phone_number']
-#             user_city = form.cleaned_data['city_name']
-#             user = CustomUser.objects.create_user(
-#                 username=username,
-#                 password=password,
-#                 first_name=first_name,
-#                 last_name=last_name,
-#                 email=email,
-#                 phone_number=phone_number,
-#                 user_city=user_city,
-#                 role='Standard',
-#             )
-#             group = Group.objects.get(name='Registered')
-#             user.groups.add(group)
-#             permissions = group.permissions.all()
-#             user.user_permissions.set(permissions)
-#             login(request, user)
-#             message = 'You have successfully registered on the site'
-#             logger.info(f"{username} was registered and authorized")
-#             send_mail(
-#                 subject='Registration',
-#                 from_email='Siteweather',
-#                 message=message,
-#                 recipient_list=[email]
-#             )
-#             return redirect('siteweather:profile:profile', pk=user.pk)
-#         return render(request, self.template_name, {'form': form})
+        base_permissions = group.permissions.all()
+        user.user_permissions.set(base_permissions)
+        login(self.request, user)
 
 
-class UserLoginFormView(LoginView):
-    form_class = UserLoginForm
+class UserLoginFormView(GenericAPIView):
+    serializer_class = LoginSerializer
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
+    parser_classes = (MultiPartParser, FormParser)
     template_name = 'authentication/login.html'
+    form_class = UserLoginForm
 
     def get(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
@@ -90,20 +71,19 @@ class UserLoginFormView(LoginView):
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.user, request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                user = CustomUser.objects.get(username=username)
-                logger.info(f"{username} was authorized")
-                return redirect('siteweather:profile:profile', pk=user.id)
+        serializer = LoginSerializer(data={'username': request.data['username'],
+                                           'password': request.data['password']})
+        if serializer.is_valid():
+            user = serializer.validated_data['password']
+            login(request, user)
+            return redirect('siteweather:profile:profile', pk=user.pk)
         else:
-            if CustomUser.objects.filter(username=form.cleaned_data['username']):
-                logger.warning(f"Unsuccessful authorization into {form.cleaned_data['username']}")
-        return render(request, self.template_name, {'form': form})
+            logger.warning(f"Unsuccessful authorization into {serializer.validated_data['username']}")
+            return Response({
+                'errors': serializer.errors,
+                'form': self.form_class(request.user)
+                # todo: Form destroys API response
+                }, template_name=self.template_name, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 class UserLogoutView(View):
@@ -121,3 +101,13 @@ class UserLogoutView(View):
 
 class AdminLogoutView(UserLogoutView):
     url = '/admin/'
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="SWAGGER",
+        default_version='v1',
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)

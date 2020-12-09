@@ -3,7 +3,7 @@
 
 
 {% block title %}
-  {{ city_item.city_name }} | {{ city_item.timestamp|date:'m/d/Y' }}
+  {{ city_item.city_name }} | {{ city_item.timestamp|parse_time|date:'m-d-Y' }}
 {% endblock %}
 
 {% block sidebar %}
@@ -37,7 +37,7 @@
     {% endfor %}
     <div class="card-body">
       <div class="media">
-        <img src="https://openweathermap.org/img/w/{{ city_item.weather_icon }}.png">
+        <img src="https://openweathermap.org/img/w/{{ city_item.weather_icon }}.png" alt="icon">
         <div class="media-body">
           <h6 class="card-text">{{ city_item.temperature }}°C <br>
             {{ city_item.weather_full_description }}</h6>

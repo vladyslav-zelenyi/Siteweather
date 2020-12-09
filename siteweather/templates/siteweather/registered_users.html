@@ -10,35 +10,35 @@
 {% endblock %}
 
 {% block pagination %}
-  {% if user.role == 'Premium' or user.is_superuser %}
+  {% if perms.siteweather.see_users or user.is_superuser or user.role == 'Premium' %}
     {% include 'inc/_users_pagination.html' %}
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  {% if not profile %}
-    {% if user.is_authenticated %}
-      <div class="btn btn-block disabled btn-success">
-        <strong>
-          Can not find any user
-          {% if request.GET.dict.city_name_filter %}
-            from {{ request.GET.dict.city_name_filter|correct_name }}
-          {% endif %}
-          {% if request.GET.dict.first_name_filter %}
-            <br>
-            whose name starts with {{ request.GET.dict.first_name_filter|correct_name }}
-            {{ request.GET.dict.last_name_filter|correct_name }}
-          {% elif request.GET.dict.last_name_filter|correct_name %}
-            <br>
-            whose surname starts with {{ request.GET.dict.last_name_filter|correct_name }}
-          {% endif %}
-        </strong>
-      </div>
+  {% if perms.siteweather.see_users or user.is_superuser or user.role == 'Premium' %}
+    {% if not results %}
+      {% if user.is_authenticated %}
+        <div class="btn btn-block disabled btn-success">
+          <strong>
+            Can not find any user
+            {% if request.GET.dict.city_name_filter %}
+              from {{ request.GET.dict.city_name_filter|correct_name }}
+            {% endif %}
+            {% if request.GET.dict.first_name_filter %}
+              <br>
+              whose name starts with {{ request.GET.dict.first_name_filter|correct_name }}
+              {{ request.GET.dict.last_name_filter|correct_name }}
+            {% elif request.GET.dict.last_name_filter|correct_name %}
+              <br>
+              whose surname starts with {{ request.GET.dict.last_name_filter|correct_name }}
+            {% endif %}
+          </strong>
+        </div>
+      {% endif %}
     {% endif %}
-  {% endif %}
-  {% if user.role == 'Premium' or user.is_superuser %}
     <div class="list-group">
-      {% for person in profile %}
+      {% for person in results %}
         <a href="{% url 'siteweather:profile:profile' person.pk %}" class="list-group-item-action list-group-item">
           {{ person.first_name }} {{ person.last_name }}
           {% if person.user_city %}

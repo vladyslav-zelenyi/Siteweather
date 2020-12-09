@@ -1,7 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 
 from .forms import GroupAdminForm
 from siteweather.models import CityBlock, CustomUser
@@ -11,11 +11,26 @@ admin.site.unregister(Group)
 
 
 def make_premium(modeladmin, request, queryset):
-    queryset.update(role='Premium')
+    if request.user.is_superuser:
+        queryset.update(role='Premium')
+        for user in queryset:
+            permission = Permission.objects.get(codename='see_users')
+            user.user_permissions.add(permission)
+    else:
+        messages.add_message(request, messages.ERROR, 'Forbidden')
 
 
 def make_standard(modeladmin, request, queryset):
-    queryset.update(role='Standard')
+    if request.user.is_superuser:
+        queryset.update(role='Standard')
+        for user in queryset:
+            permission = Permission.objects.get(codename='see_users')
+            user.user_permissions.remove(permission)
+    else:
+        messages.add_message(request, messages.ERROR, 'Forbidden')
+
+
+# todo: Make available 'delete' action only for superusers
 
 
 make_premium.short_description = 'Grant Premium status to selected Users'
@@ -42,9 +57,8 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username',)
     list_filter = ('date_joined', 'is_superuser', 'role')
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'role')}),
+        (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone_number', 'user_city')}),
-
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     superuser_fieldsets = ('Permissions', {

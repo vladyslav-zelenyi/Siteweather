@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load rest_framework %}
 {% load siteweather_extras %}
 
 {% block sidebar %}
@@ -24,8 +25,19 @@
           <label for="{{ form.username.id_for_label }}">
             <h6>Username:</h6>
             {{ form.username }} <br>
-            {% if form.errors %}
-              {% for error in form.username.errors %}
+            {% if errors %}
+              {% for error in errors.username %}
+                <div class="alert alert-danger">
+                  <strong>{{ error|escape }}</strong>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </label>
+          <label for="{{ form.email.id_for_label }}">
+            <h6>Email:</h6>
+            {{ form.email }} <br>
+            {% if errors %}
+              {% for error in errors.email %}
                 <div class="alert alert-danger">
                   <strong>{{ error|escape }}</strong>
                 </div>
@@ -39,8 +51,8 @@
           <label for="{{ form.password2.id_for_label }}">
             <h6>Repeat password:</h6>
             {{ form.password2 }} <br>
-            {% if form.errors %}
-              {% for error in form.password2.errors %}
+            {% if errors %}
+              {% for error in errors.password2 %}
                 <div class="alert alert-danger">
                   <strong>{{ error|escape }}</strong>
                 </div>
@@ -50,8 +62,8 @@
           <label for="{{ form.first_name.id_for_label }}">
             <h6>First name:</h6>
             {{ form.first_name }} <br>
-            {% if form.errors %}
-              {% for error in form.first_name.errors %}
+            {% if errors %}
+              {% for error in errors.first_name %}
                 <div class="alert alert-danger">
                   <strong>{{ error|escape }}</strong>
                 </div>
@@ -61,30 +73,19 @@
           <label for="{{ form.last_name.id_for_label }}">
             <h6>Surname:</h6>
             {{ form.last_name }} <br>
-            {% if form.errors %}
-              {% for error in form.last_name.errors %}
+            {% if errors %}
+              {% for error in errors.last_name %}
                 <div class="alert alert-danger">
                   <strong>{{ error|escape }}</strong>
                 </div>
               {% endfor %}
             {% endif %}
           </label>
-          <label for="{{ form.city_name.id_for_label }}">
+          <label for="{{ form.user_city.id_for_label }}">
             <h6>City:</h6>
-            {{ form.city_name }} <br>
-            {% if form.errors %}
-              {% for error in form.city_name.errors %}
-                <div class="alert alert-danger">
-                  <strong>{{ error|escape }}</strong>
-                </div>
-              {% endfor %}
-            {% endif %}
-          </label>
-          <label for="{{ form.email.id_for_label }}">
-            <h6>Email:</h6>
-            {{ form.email }} <br>
-            {% if form.errors %}
-              {% for error in form.email.errors %}
+            {{ form.user_city }} <br>
+            {% if errors %}
+              {% for error in errors.user_city %}
                 <div class="alert alert-danger">
                   <strong>{{ error|escape }}</strong>
                 </div>
@@ -94,8 +95,8 @@
           <label for="{{ form.phone_number.id_for_label }}">
             <h6>Phone number:</h6>
             {{ form.phone_number }} <br>
-            {% if form.errors %}
-              {% for error in form.phone_number.errors %}
+            {% if errors %}
+              {% for error in errors.phone_number %}
                 <div class="alert alert-danger">
                   <strong>{{ error|escape }}</strong>
                 </div>
