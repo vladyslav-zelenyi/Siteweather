@@ -12,7 +12,7 @@ from drf_yasg.openapi import Parameter
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions, status
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, GenericAPIView
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
 
@@ -25,7 +25,7 @@ from .serializers import CityBlockSerializer, CustomUserSerializer
 logger = logging.getLogger('django')
 
 
-class PersonalSiteSettings(View):
+class PersonalSiteSettings(GenericAPIView):
     template_name = 'siteweather/site_settings.html'
 
     def get(self, request, *args, **kwargs):
@@ -34,6 +34,17 @@ class PersonalSiteSettings(View):
     def post(self, request, *args, **kwargs):
         request.session['django_timezone'] = request.POST['timezone']
         return redirect('siteweather:home')
+
+
+# class PersonalSiteSettings(View):
+#     template_name = 'siteweather/site_settings.html'
+#
+#     def get(self, request, *args, **kwargs):
+#         return render(request, self.template_name, {'timezones': pytz.common_timezones})
+#
+#     def post(self, request, *args, **kwargs):
+#         request.session['django_timezone'] = request.POST['timezone']
+#         return redirect('siteweather:home')
 
 
 class UsersList(ListAPIView):
