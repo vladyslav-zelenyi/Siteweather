@@ -22,9 +22,10 @@
     <div class="card mb-4">
       <div class="card-header">
         <div class="form-group">
-          <label for="{{ form.username.id_for_label }}">
+          <label for="id_username">
             <h6>Username:</h6>
-            {{ form.username }} <br>
+            <input type="text" class="form-control" name="username"
+                   value="{{ data.username }}" required="" id="id_username"> <br>
             {% if errors %}
               {% for error in errors.username %}
                 <div class="alert alert-danger">
@@ -33,9 +34,10 @@
               {% endfor %}
             {% endif %}
           </label>
-          <label for="{{ form.email.id_for_label }}">
+          <label for="id_email">
             <h6>Email:</h6>
-            {{ form.email }} <br>
+            <input type="email" class="form-control" name="email"
+                   value="{{ data.email }}" required="" id="id_email"> <br>
             {% if errors %}
               {% for error in errors.email %}
                 <div class="alert alert-danger">
@@ -44,13 +46,15 @@
               {% endfor %}
             {% endif %}
           </label>
-          <label for="{{ form.password.id_for_label }}">
+          <label for="id_password">
             <h6>Password:</h6>
-            {{ form.password }}
+            <input type="password" class="form-control" name="password"
+                   value="{{ data.password }}" required="" id="id_password">
           </label>
-          <label for="{{ form.password2.id_for_label }}">
+          <label for="id_password2">
             <h6>Repeat password:</h6>
-            {{ form.password2 }} <br>
+            <input type="password" class="form-control" name="password2"
+                   value="{{ data.password2 }}" required="" id="id_password2"> <br>
             {% if errors %}
               {% for error in errors.password2 %}
                 <div class="alert alert-danger">
@@ -59,9 +63,10 @@
               {% endfor %}
             {% endif %}
           </label>
-          <label for="{{ form.first_name.id_for_label }}">
+          <label for="id_first_name">
             <h6>First name:</h6>
-            {{ form.first_name }} <br>
+            <input type="text" class="form-control" name="first_name"
+                   value="{{ data.first_name }}" required="" id="id_first_name"> <br>
             {% if errors %}
               {% for error in errors.first_name %}
                 <div class="alert alert-danger">
@@ -70,9 +75,10 @@
               {% endfor %}
             {% endif %}
           </label>
-          <label for="{{ form.last_name.id_for_label }}">
+          <label for="id_last_name">
             <h6>Surname:</h6>
-            {{ form.last_name }} <br>
+            <input type="text" class="form-control" name="last_name"
+                   value="{{ data.last_name }}" required="" id="id_last_name"> <br>
             {% if errors %}
               {% for error in errors.last_name %}
                 <div class="alert alert-danger">
@@ -81,9 +87,10 @@
               {% endfor %}
             {% endif %}
           </label>
-          <label for="{{ form.user_city.id_for_label }}">
+          <label for="id_user_city">
             <h6>City:</h6>
-            {{ form.user_city }} <br>
+            <input type="text" class="form-control" name="user_city"
+                   value="{{ data.user_city }}" required="" id="id_user_city"> <br>
             {% if errors %}
               {% for error in errors.user_city %}
                 <div class="alert alert-danger">
@@ -92,9 +99,10 @@
               {% endfor %}
             {% endif %}
           </label>
-          <label for="{{ form.phone_number.id_for_label }}">
+          <label for="id_phone_number">
             <h6>Phone number:</h6>
-            {{ form.phone_number }} <br>
+            <input type="text" class="form-control" name="phone_number"
+                   value="{{ data.phone_number }}" required="" id="id_phone_number"> <br>
             {% if errors %}
               {% for error in errors.phone_number %}
                 <div class="alert alert-danger">

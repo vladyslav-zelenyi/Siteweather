@@ -2,12 +2,10 @@ import logging
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import Group
-from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
-from django.views.generic.base import View
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
-from rest_framework import status, permissions, serializers
+from rest_framework import status, permissions
 from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
@@ -15,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from siteweather.authentication.forms import *
-from siteweather.serializers import RegistrationSerializer, LoginSerializer, CustomUserSerializer
+from siteweather.serializers import RegistrationSerializer, LoginSerializer
 
 logger = logging.getLogger('django')
 
@@ -32,9 +30,7 @@ class RegisterFormView(CreateAPIView):
         if self.request.user.is_authenticated:
             return redirect('siteweather:profile:profile', pk=self.request.user.pk)
         form = self.form_class(request.user)
-        # return Response({'form': form}, template_name=self.template_name)
         return render(request, self.template_name, {'form': form})
-        # There is a problem in swagger when user is not authenticated and tries API
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -44,8 +40,7 @@ class RegisterFormView(CreateAPIView):
         else:
             return Response({
                 'errors': serializer.errors,
-                'form': self.form_class(request.user)
-                # todo: Form destroys API response
+                'data': serializer.data,
             }, template_name=self.template_name, status=status.HTTP_406_NOT_ACCEPTABLE)
 
     def perform_create(self, serializer):
@@ -78,15 +73,17 @@ class UserLoginFormView(GenericAPIView):
             login(request, user)
             return redirect('siteweather:profile:profile', pk=user.pk)
         else:
-            logger.warning(f"Unsuccessful authorization into {serializer.validated_data['username']}")
+            # Make warning if user with entered username exists
+            user = CustomUser.objects.filter(username__exact=serializer.data['username']).exists()
+            if user:
+                logger.warning(f"Unsuccessful authorization into {serializer.data['username']}")
             return Response({
                 'errors': serializer.errors,
-                'form': self.form_class(request.user)
-                # todo: Form destroys API response
+                'data': serializer.data,
                 }, template_name=self.template_name, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
-class UserLogoutView(View):
+class UserLogoutView(APIView):
     url = 'siteweather:home'
 
     def get(self, request, *args, **kwargs):
@@ -97,6 +94,7 @@ class UserLogoutView(View):
         logout(request)
         request.session['django_timezone'] = timezone
         return redirect(self.url)
+    # todo: Rework return?
 
 
 class AdminLogoutView(UserLogoutView):

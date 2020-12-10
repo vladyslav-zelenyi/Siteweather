@@ -17,9 +17,10 @@
     <div class="card mb-4">
       <div class="card-header">
         <div class="form-group">
-          <label for="{{ form.username.id_for_label }}">
+          <label for="id_username">
             <h6>Username:</h6>
-            {{ form.username }} <br>
+            <input type="text" class="form-control" name="username"
+                   value="{{ data.username }}" required="" id="id_username"> <br>
             {% if errors %}
               {% for error in errors.username %}
                 <div class="alert alert-danger">
@@ -28,9 +29,10 @@
               {% endfor %}
             {% endif %}
           </label>
-          <label for="{{ form.password.id_for_label }}">
+          <label for="id_password">
             <h6>Password:</h6>
-            {{ form.password }}
+            <input type="password" class="form-control" name="password"
+                   value="{{ data.password }}" required="" id="id_password"> <br>
             {% if errors %}
               <br>
               {% for error in errors.password %}
