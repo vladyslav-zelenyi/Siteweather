@@ -1,14 +1,17 @@
+from datetime import date, timedelta
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html
-# from siteweather.authentication.models import CustomUser
+from django.utils.timezone import localdate
 
 
 class CustomUser(AbstractUser):
     photo = models.ImageField(null=True, blank=True, upload_to='users/%Y/%m/%d')
     phone_number = models.CharField(verbose_name='Phone number', max_length=15, blank=True)
     user_city = models.CharField(verbose_name='City', max_length=50, blank=True)
+    date_of_birth = models.DateField(verbose_name='Date of birth', null=True, blank=False)
 
     STANDARD = 'Standard'
     PREMIUM = 'Premium'
@@ -38,6 +41,21 @@ class CustomUser(AbstractUser):
         verbose_name = 'User'
         verbose_name_plural = 'Users'
         ordering = ['username']
+
+    def age(self):
+        today = date.today()
+        age = today.year - self.date_of_birth.year - ((self.date_of_birth.month, self.date_of_birth.day) >
+                                                      (today.month, today.day))
+        return age
+
+    def is_registered_recently(self):
+        days_to_stay_marked = timedelta(days=3)
+        today = localdate()
+        if (today - self.date_joined.date()) > days_to_stay_marked:
+            return False
+        return True
+
+    is_registered_recently.boolean = True
 
 
 class CityBlock(models.Model):

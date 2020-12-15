@@ -6,7 +6,6 @@ from django.contrib.auth.models import Group, Permission
 from .forms import GroupAdminForm
 from siteweather.models import CityBlock, CustomUser
 
-
 admin.site.unregister(Group)
 
 
@@ -50,20 +49,20 @@ class CityBlockAdmin(ModelAdmin):
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    list_display = (
-        'username', 'colored_premium', 'email', 'first_name', 'last_name', 'phone_number', 'is_superuser',
-    )
+    list_display = ('username', 'colored_premium', 'email', 'first_name', 'last_name', 'phone_number', 'is_superuser',
+                    'age', 'is_registered_recently')
     list_display_links = ('username',)
     search_fields = ('username',)
-    list_filter = ('date_joined', 'is_superuser', 'role')
+    list_filter = ('date_joined', 'is_superuser', 'role',)
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone_number', 'user_city')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'date_of_birth', 'email', 'phone_number',
+                                      'user_city')}),
+        ('Dates related to the account', {'fields': ('last_login', 'date_joined')}),
     )
     superuser_fieldsets = ('Permissions', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
-        }),
+        'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+    }),
     list_per_page = 12
     radio_fields = {'role': admin.VERTICAL}
     actions = [make_premium, make_standard]

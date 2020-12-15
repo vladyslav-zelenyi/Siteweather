@@ -11,13 +11,12 @@ from rest_framework.response import Response
 
 from siteweather.models import CustomUser
 from siteweather.serializers import CustomUserSerializer, UpdateProfileSerializer, \
-    UpdatePasswordSerializer
+    UpdatePasswordSerializer, SuperUserCustomUserSerializer
 
 logger = logging.getLogger('django')
 
 
 class UserProfile(RetrieveAPIView):
-    serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     parser_classes = (MultiPartParser, FormParser)
@@ -27,6 +26,12 @@ class UserProfile(RetrieveAPIView):
         profile = self.get_object()
         serialized = self.get_serializer(profile).data
         return Response({'profile': serialized}, template_name='profile/profile.html')
+
+    def get_serializer_class(self):
+        if self.request.user.is_superuser:
+            return SuperUserCustomUserSerializer
+        else:
+            return CustomUserSerializer
 
 
 class UserProfileUpdate(UpdateAPIView):
@@ -78,7 +83,6 @@ class UserPasswordUpdate(UpdateAPIView):
         else:
             return Response({'errors': serializer.errors}, template_name=self.template_name,
                             status=status.HTTP_406_NOT_ACCEPTABLE)
-        # todo: Correct response, remove "PATCH" (how?)
 
     def get_object(self):
         return CustomUser.objects.get(pk=self.request.user.pk)

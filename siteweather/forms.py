@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.models import Group
 
-from siteweather.authentication.forms import BaseCustomUserForm, UserRegisterForm
+from siteweather.authentication.forms import BaseCustomUserForm
 from siteweather.models import CustomUser
 
 logger = logging.getLogger('django')
@@ -15,28 +15,6 @@ class CityBlockForm(BaseCustomUserForm):
     last_name = None
     email = None
     phone_number = None
-
-
-class UserUpdateForm(BaseCustomUserForm):
-    photo = forms.ImageField(label='photo', widget=forms.FileInput(
-        attrs={'class': 'form-control'}), required=False, )
-
-
-class UserUpdatePasswordForm(UserRegisterForm):
-    email = None
-    phone_number = None
-    first_name = None
-    last_name = None
-    username = None
-    city_name = None
-
-    def clean_password2(self):
-        data = self.cleaned_data
-        if data['password'] != data['password2']:
-            self.add_error('password2', 'The verification password does not match the entered one')
-        elif self.user.check_password(data['password']):
-            self.add_error('password2', 'You cannot change the password to the same')
-        return data
 
 
 class CityBlockFilterForm(forms.Form):

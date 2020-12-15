@@ -29,12 +29,14 @@
           {{ profile.first_name }} {{ profile.last_name }}
         </strong>
       </h5>
+      {{ profile.age }} y.o.
     </div>
     <div class="card-body">
       <div class="media">
         <div class="media-body">
           <h6 class="card-text">
-            {% if profile.username == user.username or user.is_superuser %}
+            {{ profile.date_of_birth }} - there <br>
+            {% if profile.email == user.email or user.is_superuser %}
               Username – {{ profile.username }} <br>
             {% else %}
               Username is hidden <br>
@@ -42,6 +44,7 @@
             {% if profile.email %}
               Email – {{ profile.email }} <br>
             {% endif %}
+            Date of birth – {{ profile.date_of_birth }} <br>
             {% if profile.phone_number %}
               Phone number – {{ profile.phone_number }} <br>
             {% endif %}
@@ -55,10 +58,15 @@
     </div>
     <div class="card-footer text-muted">
       <strong>
-        {% if profile.username == user.username %}
+        {% if profile.email == user.email %}
           <a href="{% url 'siteweather:profile:profile_update' %}">Edit profile</a> <br>
         {% endif %}
       </strong>
+      {% if profile.is_registered_recently %}
+        <strong>
+          Registered recently
+        </strong>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

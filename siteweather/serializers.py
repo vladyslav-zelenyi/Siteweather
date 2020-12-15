@@ -1,10 +1,11 @@
 import re
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 import pytz
 import requests
 from django.contrib.auth import update_session_auth_hash, authenticate
 from django.core.mail import send_mail
+from django.utils.timezone import now, localdate
 from pytz import UnknownTimeZoneError
 from rest_framework import serializers
 
@@ -14,15 +15,44 @@ from task import settings
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    age = serializers.SerializerMethodField(method_name='get_age')
+    is_registered_recently = serializers.SerializerMethodField(method_name='get_is_registered_recently')
 
     class Meta:
         model = CustomUser
-        fields = ['pk', 'username', 'first_name', 'last_name', 'email', 'date_joined',
-                  'photo', 'phone_number', 'user_city', 'role']
+        fields = ['pk', 'first_name', 'last_name', 'email', 'photo', 'phone_number', 'user_city', 'age',
+                  'is_registered_recently', 'date_of_birth', 'role']
+
+    def get_age(self, obj):
+        today = date.today()
+        age = today.year - obj.date_of_birth.year - ((obj.date_of_birth.month, obj.date_of_birth.day) >
+                                                     (today.month, today.day))
+        return age
+
+    def get_is_registered_recently(self, obj):
+        days_to_stay_marked = timedelta(days=3)
+        today = localdate()
+        if (today - obj.date_joined.date()) > days_to_stay_marked:
+            return False
+        return True
+
+
+class SuperUserCustomUserSerializer(CustomUserSerializer):
+    days_since_joined = serializers.SerializerMethodField(method_name='get_days_since_joined')
+    user_permissions = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
+    groups = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
+
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
+
+    def get_days_since_joined(self, obj):
+        return (now() - obj.date_joined).days
 
 
 class CityBlockSerializer(serializers.ModelSerializer):
     customers = CustomUserSerializer(many=True, read_only=True)
+    searched_by_user = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = CityBlock
@@ -41,11 +71,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'password2', 'phone_number', 'user_city']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'password2', 'phone_number', 'user_city',
+                  'date_of_birth']
         extra_kwargs = {
             'email': {'required': True},
             'password2': {'required': True},
             'user_city': {'required': True},
+            'date_of_birth': {'required': True},
         }
 
     def validate_password2(self, value):
@@ -56,12 +88,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def validate_first_name(self, value):
         if len(value) < 2:
-            raise serializers.ValidationError('First name is too short')
+            raise serializers.ValidationError('First name has to contain at least 2 symbols')
         return value
 
     def validate_last_name(self, value):
         if len(value) < 2:
-            raise serializers.ValidationError('Surname is too short')
+            raise serializers.ValidationError('Surname has to contain at least 2 symbols')
         return value
 
     def validate_phone_number(self, value):
@@ -87,7 +119,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if r['cod'] == '404':
             raise serializers.ValidationError('City was not found')
         if r['cod'] == '500':
-            raise serializers.ValidationError('sss')
+            raise serializers.ValidationError('OpenWeather server error')
         return value
 
     def validate_username(self, value):
@@ -100,12 +132,28 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Username is taken')
         return value
 
+    def validate_date_of_birth(self, value):
+        if value > date.today():
+            raise serializers.ValidationError('You cannot provide a date of birth from the future')
+        return value
+
+
+class FindCityBlockSerializer(CityBlockSerializer, RegistrationSerializer):
+    class Meta:
+        model = CityBlock
+        fields = ['city_name']
+
+    def validate_city_name(self, city_name):
+        return self.validate_user_city(city_name)
+
 
 class UpdateProfileSerializer(RegistrationSerializer):
+    photo_clear = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'user_city', 'photo']
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'user_city', 'photo', 'photo_clear',
+                  'date_of_birth']
 
     def validate_email(self, value):
         object_to_compare = CustomUser.objects.filter(email=value)
@@ -116,11 +164,10 @@ class UpdateProfileSerializer(RegistrationSerializer):
     def save(self, request, **kwargs):
         validated_data = {**self.validated_data, **kwargs}
         check = request.POST.get('photo-clear')
-        if check == 'on':
+        if check == 'on' or request.POST.get('photo_clear') == 'true':
             validated_data['photo'] = None
             self.instance = self.update(self.instance, validated_data)
             return self.instance
-        # todo: Creates problem with API - there is no way to delete the photo by API.
         if validated_data.get('photo') is None:
             validated_data['photo'] = self.instance.photo
         self.instance = self.update(self.instance, validated_data)
@@ -128,7 +175,6 @@ class UpdateProfileSerializer(RegistrationSerializer):
 
 
 class UpdatePasswordSerializer(RegistrationSerializer):
-
     class Meta:
         model = CustomUser
         fields = ['password', 'password2']
@@ -161,7 +207,7 @@ class LoginSerializer(serializers.ModelSerializer):
         help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.',
         validators=[username_validator],
     )
-    password = serializers.CharField(max_length=150, required=True,)
+    password = serializers.CharField(max_length=150, required=True, )
 
     class Meta:
         model = CustomUser
@@ -173,3 +219,32 @@ class LoginSerializer(serializers.ModelSerializer):
         if user:
             return user
         raise serializers.ValidationError('Wrong username or password')
+
+
+class DeleteCityBlockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CityBlock
+        fields = ['pk', 'city_name', 'weather_main_description', 'weather_full_description', 'timestamp',
+                  'temperature', 'weather_icon', 'humidity', 'pressure', 'wind_speed', 'country']
+        read_only_fields = ['city_name', 'weather_main_description', 'weather_full_description', 'timestamp',
+                            'temperature', 'weather_icon', 'humidity', 'pressure', 'wind_speed', 'country']
+
+
+class AdminDeleteCityBlockSerializer(serializers.ModelSerializer):
+    customers = CustomUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = CityBlock
+        fields = ['pk', 'city_name', 'weather_main_description', 'weather_full_description', 'timestamp',
+                  'temperature', 'weather_icon', 'humidity', 'pressure', 'wind_speed', 'country',
+                  'searched_by_user', 'customers']
+        read_only_fields = ['city_name', 'weather_main_description', 'weather_full_description', 'timestamp',
+                            'temperature', 'weather_icon', 'humidity', 'pressure', 'wind_speed', 'country',
+                            'searched_by_user', 'customers']
+
+
+timezone = pytz.common_timezones
+
+
+class SiteSettingsSerializer(serializers.Serializer):
+    timezone_choice = serializers.ChoiceField(timezone)

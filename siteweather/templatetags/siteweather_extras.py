@@ -1,5 +1,3 @@
-import datetime
-
 from django import template
 
 from siteweather.models import CustomUser, CityBlock
@@ -29,3 +27,8 @@ def correct_name(city_name):
 @register.filter
 def parse_time(time):
     return parse(time)
+
+
+@register.filter
+def parse_date_to_string(date_in_html):
+    return str(date_in_html)
