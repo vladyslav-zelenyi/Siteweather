@@ -10,7 +10,7 @@ siteweather_urls = [
     path('<int:pk>/delete_confirmation/', DeleteCityBlock.as_view(), name='delete_confirmation'),
     path('find_by/', FindCity.as_view(), name='find_by'),
     path('registered_users/', UsersList.as_view(), name='users_list'),
-    path('site_settings/', PersonalSiteSettings.as_view(), name='site_settings'),
+    path('site_settings/', PersonalSiteSettingsAPIView.as_view(), name='site_settings'),
 ]
 
 urlpatterns = [

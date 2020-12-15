@@ -41,7 +41,7 @@ class RegisterFormView(CreateAPIView):
             return Response({
                 'errors': serializer.errors,
                 'data': serializer.data,
-            }, template_name=self.template_name, status=status.HTTP_406_NOT_ACCEPTABLE)
+            }, status=status.HTTP_406_NOT_ACCEPTABLE)
 
     def perform_create(self, serializer):
         user = CustomUser.objects.create_user(**serializer.data, role='Standard')
@@ -73,7 +73,6 @@ class UserLoginFormView(GenericAPIView):
             login(request, user)
             return redirect('siteweather:profile:profile', pk=user.pk)
         else:
-            # Make warning if user with entered username exists
             user = CustomUser.objects.filter(username__exact=serializer.data['username']).exists()
             if user:
                 logger.warning(f"Unsuccessful authorization into {serializer.data['username']}")
@@ -94,7 +93,6 @@ class UserLogoutView(APIView):
         logout(request)
         request.session['django_timezone'] = timezone
         return redirect(self.url)
-    # todo: Rework return?
 
 
 class AdminLogoutView(UserLogoutView):

@@ -24,13 +24,14 @@
     <div class="card mb-4">
       <div class="card-header">
         <div class="form-group">
-          <label for="{{ form.user_city.id_for_label }}">
+          <label for="id_city_name">
             City name:
           </label>
-          {{ form.user_city }}
-          {% if form.errors %}
+          <input type="text" class="form-control" name="city_name"
+                   value="{{ data.username }}" required="" id="id_city_name">
+          {% if errors %}
             <br>
-            {% for error in form.user_city.errors %}
+            {% for error in errors.city_name %}
               <div class="alert alert-danger">
                 <strong>{{ error|escape }}</strong>
               </div>

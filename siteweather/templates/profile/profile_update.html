@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load siteweather_extras %}
 
 {% block title %}
   {{ user.first_name }} {{ user.last_name }}
@@ -80,6 +81,19 @@
                     {% endfor %}
                   {% endif %}
                 </label>
+                <label for="id_date_of_birth">
+                  Date of birth:
+                  <input type="date" class="form-control" name="date_of_birth"
+                         value="{{ user.date_of_birth|parse_date_to_string }}" required="" id="id_date_of_birth"
+                         max="{% now 'Y-m-d' %}">
+                </label>
+                {% if errors %}
+                  {% for error in errors.date_of_birth %}
+                    <div class="alert alert-danger">
+                      <strong>{{ error|escape }}</strong>
+                    </div>
+                  {% endfor %}
+                {% endif %}
                 <label for="id_phone_number">
                   <h6>Phone number:</h6>
                   <input type="text" class="form-control" name="phone_number"

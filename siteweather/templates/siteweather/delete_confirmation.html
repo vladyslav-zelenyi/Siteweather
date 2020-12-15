@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load siteweather_extras %}
 
 {% block title %}
   {{ city_item.city_name }} | {{ city_item.timestamp|date:'m/d/Y' }}
@@ -19,32 +20,40 @@
 {% endblock %}
 
 {% block content %}
-  <div class="card mb-4">
-    <div class="card-header">
-      <h5>
-        {{ city_item.city_name }} | {{ city_item.country }}
-      </h5>
+  {% if deleted %}
+    <div class="btn btn-block disabled btn-danger">
+      <strong>
+        City block has been successfully deleted
+      </strong>
     </div>
-    <div class="card-body">
-      <div class="media">
-        <img src="https://openweathermap.org/img/w/{{ city_item.weather_icon }}.png" alt="icon">
-        <div class="media-body">
-          <h6 class="card-text">{{ city_item.temperature }}°C</h6>
-          <h5 class="card-text">{{ city_item.weather_main_description }} </h5>
+  {% else %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5>
+          {{ city_item.city_name }} | {{ city_item.country }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="media">
+          <img src="https://openweathermap.org/img/w/{{ city_item.weather_icon }}.png" alt="icon">
+          <div class="media-body">
+            <h6 class="card-text">{{ city_item.temperature }}°C</h6>
+            <h5 class="card-text">{{ city_item.weather_main_description }} </h5>
+          </div>
         </div>
       </div>
+      <div class="card-footer text-muted">
+        {{ city_item.timestamp|parse_time|date:'Y-m-d | H:i:s' }}
+      </div>
     </div>
-    <div class="card-footer text-muted">
-      {{ city_item.timestamp|date:'Y-m-d | H:i:s' }}
-    </div>
-  </div>
-  <form action="" method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn-outline-primary btn btn-block">
-      Delete
-    </button>
-    <br>
-  </form>
+    <form action="" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn-outline-primary btn btn-block">
+        Delete
+      </button>
+      <br>
+    </form>
+  {% endif %}
 {% endblock %}
 
 {% block time %}
