@@ -22,17 +22,39 @@
         List of users
       </a>
     {% endif %}
-    {#    <form action="{% url 'siteweather:auth:logout' %}" method="get" id="css_form_id">#}
-    {#      <button type="submit" formmethod="get" class="list-group-item list-group-item-action border-top-0">#}
-    {#        Logout#}
-    {#      </button>#}
-    {#    </form>#}
-    <a href="{% url 'siteweather:auth:logout' %}" class="list-group-item list-group-item-action border-top-0">
+    <button class="list-group-item list-group-item-action border-top-0" id="logout-button"><a href=""
+                                                                                              class=""> </a>
+
       Logout
-    </a>
+    </button>
   {% endif %}
   <a href="{% url 'siteweather:site_settings' %}" class="list-group-item list-group-item-action border-top-0">
     Personal website settings
   </a>
 </div>
 <br>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+{% block javascript %}
+  <script>
+    $(document).ready(function () {
+      let token = '{{ csrf_token }}';
+      $("#logout-button").click(function (event) {
+        event.preventDefault();
+        $.ajax({
+          type: 'POST',
+          url: '{% url 'siteweather:auth:logout' %}',
+          headers: {"X-CSRFToken": token},
+          success: function () {
+            location.href = '{% url 'siteweather:home' %}';
+          },
+          failure: function (response) {
+            alert(response["responseJSON"]["error"]);
+          }
+        })
+      })
+    })
+  </script>
+{% endblock %}

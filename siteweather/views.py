@@ -9,7 +9,7 @@ from drf_yasg.openapi import Parameter
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions, status
-from rest_framework.generics import RetrieveAPIView, ListAPIView, CreateAPIView, GenericAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, CreateAPIView, GenericAPIView, DestroyAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -62,7 +62,7 @@ class UsersList(ListAPIView):
         if request.user.has_perm('siteweather.see_users'):
             return self.list(request, *args, **kwargs)
         else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response({'message': 'You are not authorized to view this data'}, status=status.HTTP_403_FORBIDDEN)
 
     def get_queryset(self):
         city = self.request.GET.get('city_name_filter')
@@ -131,12 +131,12 @@ class ViewCity(RetrieveAPIView):
             users = CustomUser.objects.filter(user_city=city_item.city_name)
             user_serializer = CustomUserSerializer(users, many=True).data
             serialized['customers'] = user_serializer
-        if serialized['searched_by_user'] == request.user.pk or self.request.user.is_superuser:
+        if serialized['searched_by_user']['pk'] == request.user.pk or self.request.user.is_superuser:
             serialized['permission'] = True
         return Response({'city_item': serialized}, template_name=self.template_name)
 
 
-class DeleteCityBlock(RetrieveAPIView):
+class DeleteCityBlock(DestroyAPIView):
     queryset = CityBlock.objects.all()
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     template_name = 'siteweather/delete_confirmation.html'
@@ -158,7 +158,7 @@ class DeleteCityBlock(RetrieveAPIView):
             serializer['customers'] = user_serializer
         return Response({'city_item': serializer}, template_name=self.template_name)
 
-    def post(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         block_to_delete = CityBlock.objects.get(pk=self.kwargs['pk'])
         if block_to_delete.searched_by_user == self.request.user or self.request.user.is_superuser:
             name_of_deleted_block = block_to_delete.city_name

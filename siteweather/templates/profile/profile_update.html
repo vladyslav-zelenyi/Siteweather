@@ -9,13 +9,10 @@
   {% include 'inc/_sidebar.html' %}
 {% endblock %}
 
-{% block pagination %}
-{% endblock %}
-
 {% block content %}
   {% if request.user.is_authenticated %}
     <div class="card mb-4">
-      <form action="" method="post" autocomplete="off" enctype="multipart/form-data">
+      <form id="profile-update-form" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="card-header">
           <h5>
@@ -110,7 +107,7 @@
                 <label for="id_photo">
                   <h6>Photo:</h6>
                   {% if user.photo %}
-                    currently: <img src="{{ user.photo.url }}" width=100% alt="Photo" class="img-thumbnail">
+                    currently: <img src="{{ user.photo.url }}" width=100% alt="profile_photo" class="img-thumbnail">
                   {% endif %}
                   <input type="checkbox" name="photo-clear" id="photo-clear_id">
                   <label for="photo-clear_id">Clear</label><br>
@@ -150,4 +147,32 @@
 
 {% block time %}
   {% include 'inc/_time.html' %}
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    $(document).ready(function () {
+      let token = '{{ csrf_token }}';
+      $("#profile-update-form").submit(function (event) {
+        event.preventDefault();
+        let form_data = new FormData($("#profile-update-form")[0]);
+        form_data.append('file', $('input[type=file]')[0].files[0]);
+        {#let serializerData = $(this).serializeArray();#}
+        $.ajax({
+          type: 'PUT',
+          {#data: serializerData,#}
+          data: form_data,
+          headers: {"X-CSRFToken": token},
+          processData: false,
+          contentType: false,
+          success: function () {
+            location.href = '{% url 'siteweather:profile:profile' user.pk %}';
+          },
+          failure: function (response) {
+            alert(response["responseJSON"]["error"]);
+          }
+        })
+      })
+    })
+  </script>
 {% endblock %}

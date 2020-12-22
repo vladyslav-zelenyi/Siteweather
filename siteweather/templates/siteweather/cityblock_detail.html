@@ -10,16 +10,6 @@
   {% include 'inc/_sidebar.html' %}
 {% endblock %}
 
-{% block pagination %}
-  {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" != request.get_full_path %}
-    {% if request.META.HTTP_REFERER is not None %}
-      <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-primary btn-block">
-        Previous page
-      </a>
-    {% endif %}
-  {% endif %}
-{% endblock %}
-
 {% block content %}
   <div class="card mb-4">
     <div class="card-header">
@@ -57,11 +47,11 @@
         Users from {{ city_item.city_name }}: <br>
         {% for profile in city_item.customers %}
           {% if not forloop.last %}
-            <a href="{% url 'siteweather:profile:profile' profile.pk %}">
+            <a href="{% url 'siteweather:profile:profile' profile.username %}">
               {{ profile.first_name }} {{ profile.last_name }}
             </a>,
           {% else %}
-            <a href="{% url 'siteweather:profile:profile' profile.pk %}">
+            <a href="{% url 'siteweather:profile:profile' profile.username %}">
               {{ profile.first_name }} {{ profile.last_name }}
             </a>
           {% endif %}
@@ -70,7 +60,7 @@
     {% endif %}
     {% if city_item.permission %}
       <div class="card-footer text-muted">
-        <a href="{% url 'siteweather:delete_confirmation' city_item.pk %}">
+        <a href="{% url 'siteweather:delete' city_item.pk %}">
           Delete this block
         </a>
       </div>
