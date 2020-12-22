@@ -8,11 +8,8 @@
   Login
 {% endblock %}
 
-{% block pagination %}
-{% endblock %}
-
 {% block content %}
-  <form action="{% url 'siteweather:auth:login' %}" method="post" autocomplete="off">
+  <form action="{% url 'siteweather:auth:login' %}" method="post" autocomplete="off" id="login-form">
     {% csrf_token %}
     <div class="card mb-4">
       <div class="card-header">
@@ -53,4 +50,23 @@
 
 {% block time %}
   {% include 'inc/_time.html' %}
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    $(document).ready(function () {
+      let noticed = false;
+      $("#login-form").submit(function (event) {
+        let username_input = "input[name='username']";
+        if ($(username_input).val().length < 4) {
+          event.preventDefault();
+          if (!noticed) {
+            let error_string = $("<a disabled='true'>Your username has to contain at least 4 symbols</a>");
+            $(username_input).after(error_string);
+            noticed = true;
+          }
+        }
+      })
+    })
+  </script>
 {% endblock %}

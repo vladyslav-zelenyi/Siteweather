@@ -1,10 +1,16 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.timezone import localdate
+from django.utils.timezone import localtime
+
+
+ROLE_CHOICES = (
+    ('Standard', 'Standard'),
+    ('Premium', 'Premium'),
+)
 
 
 class CustomUser(AbstractUser):
@@ -12,16 +18,7 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(verbose_name='Phone number', max_length=15, blank=True)
     user_city = models.CharField(verbose_name='City', max_length=50, blank=True)
     date_of_birth = models.DateField(verbose_name='Date of birth', null=True, blank=False)
-
-    STANDARD = 'Standard'
-    PREMIUM = 'Premium'
-
-    ROLE_CHOICES = (
-        (STANDARD, 'Standard'),
-        (PREMIUM, 'Premium'),
-    )
-
-    role = models.CharField(max_length=100, choices=ROLE_CHOICES, default=STANDARD, verbose_name='Role')
+    role = models.CharField(max_length=100, choices=ROLE_CHOICES, default='Standard', verbose_name='Role')
 
     def colored_premium(self):
         if self.role == 'Premium':
@@ -30,6 +27,7 @@ class CustomUser(AbstractUser):
             return self.role
 
     colored_premium.short_description = 'Role'
+    colored_premium.admin_order_field = 'role'
 
     def get_absolute_url(self):
         return reverse('weather:profile', kwargs={'pk': self.pk})
@@ -41,21 +39,6 @@ class CustomUser(AbstractUser):
         verbose_name = 'User'
         verbose_name_plural = 'Users'
         ordering = ['username']
-
-    def age(self):
-        today = date.today()
-        age = today.year - self.date_of_birth.year - ((self.date_of_birth.month, self.date_of_birth.day) >
-                                                      (today.month, today.day))
-        return age
-
-    def is_registered_recently(self):
-        days_to_stay_marked = timedelta(days=3)
-        today = localdate()
-        if (today - self.date_joined.date()) > days_to_stay_marked:
-            return False
-        return True
-
-    is_registered_recently.boolean = True
 
 
 class CityBlock(models.Model):

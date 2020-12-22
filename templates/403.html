@@ -4,12 +4,38 @@
   {% include 'inc/_time.html' %}
 {% endblock %}
 
-{% block sidebar %}
-  {% include 'inc/_sidebar.html' %}
-{% endblock %}
 
 {% block content %}
   <div class="btn btn-danger disabled btn-block">
+    Status 403 <br>
     Access denied
   </div>
+{% endblock %}
+
+{% block previous_page %}
+  <div class="list-group">
+    {% if user.is_superuser or user.is_staff %}
+      <div class="list-group-item list-group-item-action" id="redirect-to-admin">
+        To the admin page
+      </div>
+    {% endif %}
+    <div class="list-group-item list-group-item-action" id="redirect-to-main">
+      To the main page
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    $(document).ready(function () {
+      $("#redirect-to-admin").on({
+        "click": function () { location.href = '/admin/'; },
+        "mouseover": function () {$(this).css('cursor', 'pointer')}
+      });
+      $("#redirect-to-main").on({
+        "click": function () { location.href = '{% url 'siteweather:home' %}'; },
+        "mouseover": function () {$(this).css('cursor', 'pointer')}
+      });
+    })
+  </script>
 {% endblock %}

@@ -12,10 +12,6 @@
   Registration
 {% endblock %}
 
-{% block pagination %}
-{% endblock %}
-
-
 {% block content %}
   <form action="{% url 'siteweather:auth:register' %}" method="post" autocomplete="off">
     {% csrf_token %}

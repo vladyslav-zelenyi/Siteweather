@@ -1,17 +1,15 @@
 import logging
 
-from django.shortcuts import redirect
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import status, permissions
+from rest_framework import status
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 
 from siteweather.models import CustomUser
-from siteweather.serializers import CustomUserSerializer, UpdateProfileSerializer, \
-    UpdatePasswordSerializer, SuperUserCustomUserSerializer
+from siteweather.profile.serializers import SuperUserCustomUserSerializer, UpdateProfileSerializer, \
+    UpdatePasswordSerializer
+from siteweather.serializers import CustomUserSerializer
 
 logger = logging.getLogger('django')
 
@@ -48,12 +46,13 @@ class UserProfileUpdate(UpdateAPIView):
         serializer = UpdateProfileSerializer(user)
         return Response(serializer.data)
 
-    def post(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         serializer = UpdateProfileSerializer(self.request.user, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
-            return Response(data=serializer.data, template_name=self.template_name, status=status.HTTP_200_OK)
+            return Response({'message': 'You have successfully updated your profile', 'data': serializer.data},
+                            status=status.HTTP_200_OK)
         else:
             return Response({'errors': serializer.errors}, template_name=self.template_name,
                             status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -73,13 +72,13 @@ class UserPasswordUpdate(UpdateAPIView):
         serializer = UpdatePasswordSerializer(user)
         return Response(serializer.data)
 
-    def post(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         serializer = UpdatePasswordSerializer(self.request.user, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             logger.warning(f'{self.request.user} updated his password')
-            return redirect('siteweather:home')
+            return Response({'message': 'Your password has been successfully updated'}, status=status.HTTP_200_OK)
         else:
             return Response({'errors': serializer.errors}, template_name=self.template_name,
                             status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -89,13 +88,3 @@ class UserPasswordUpdate(UpdateAPIView):
 
     def perform_update(self, serializer):
         serializer.save(self.request)
-
-
-schema_view = get_schema_view(
-   openapi.Info(
-      title="SWAGGER",
-      default_version='v1',
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
-)

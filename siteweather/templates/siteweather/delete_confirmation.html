@@ -9,16 +9,6 @@
   {% include 'inc/_sidebar.html' %}
 {% endblock %}
 
-{% block pagination %}
-  {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" != request.get_full_path %}
-    {% if request.META.HTTP_REFERER is not None %}
-      <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-primary btn-block">
-        Previous page
-      </a>
-    {% endif %}
-  {% endif %}
-{% endblock %}
-
 {% block content %}
   {% if deleted %}
     <div class="btn btn-block disabled btn-danger">
@@ -46,16 +36,37 @@
         {{ city_item.timestamp|parse_time|date:'Y-m-d | H:i:s' }}
       </div>
     </div>
-    <form action="" method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn-outline-primary btn btn-block">
-        Delete
-      </button>
-      <br>
-    </form>
+    {% csrf_token %}
+    <button type="submit" class="btn-outline-primary btn btn-block" id="submit-delete">
+      Delete
+    </button>
+    <br>
   {% endif %}
 {% endblock %}
 
 {% block time %}
   {% include 'inc/_time.html' %}
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    $(document).ready(function () {
+      let token = '{{ csrf_token }}';
+      $("#submit-delete").click(function (event) {
+        event.preventDefault();
+        $.ajax({
+          headers: {"X-CSRFToken": token},
+          type: 'DELETE',
+          url: "{% url 'siteweather:delete' city_item.pk %}",
+          success: function (response) {
+            location.href = {% url 'siteweather:home' %};
+            alert(response.message);
+          },
+          error: function (response) {
+            alert(response["responseJSON"]["error"]);
+          }
+        })
+      })
+    })
+  </script>
 {% endblock %}

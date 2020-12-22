@@ -3,9 +3,7 @@ import logging
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import Group
 from django.shortcuts import redirect, render
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import status, permissions
+from rest_framework import status
 from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
@@ -13,7 +11,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from siteweather.authentication.forms import *
-from siteweather.serializers import RegistrationSerializer, LoginSerializer
+from siteweather.authentication.serializers import LoginSerializer
+from siteweather.serializers import RegistrationSerializer
 
 logger = logging.getLogger('django')
 
@@ -71,7 +70,7 @@ class UserLoginFormView(GenericAPIView):
         if serializer.is_valid():
             user = serializer.validated_data['password']
             login(request, user)
-            return redirect('siteweather:profile:profile', pk=user.pk)
+            return redirect('siteweather:profile:profile', user.pk)
         else:
             user = CustomUser.objects.filter(username__exact=serializer.data['username']).exists()
             if user:
@@ -85,7 +84,7 @@ class UserLoginFormView(GenericAPIView):
 class UserLogoutView(APIView):
     url = 'siteweather:home'
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         if self.request.user.is_anonymous:
             return redirect('siteweather:auth:login')
         timezone = request.session.get('django_timezone')
@@ -97,13 +96,3 @@ class UserLogoutView(APIView):
 
 class AdminLogoutView(UserLogoutView):
     url = '/admin/'
-
-
-schema_view = get_schema_view(
-    openapi.Info(
-        title="SWAGGER",
-        default_version='v1',
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)

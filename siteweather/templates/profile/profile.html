@@ -9,18 +9,6 @@
   {% include 'inc/_sidebar.html' %}
 {% endblock %}
 
-{% block pagination %}
-  {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" != '/login/' %}
-    {% if request.META.HTTP_REFERER|cut:"http://127.0.0.1:8000" != request.get_full_path %}
-      {% if request.META.HTTP_REFERER is not None %}
-        <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-outline-primary btn-block">
-          Previous page
-        </a>
-      {% endif %}
-    {% endif %}
-  {% endif %}
-{% endblock %}
-
 {% block content %}
   <div class="card mb-4">
     <div class="card-header">
@@ -35,12 +23,7 @@
       <div class="media">
         <div class="media-body">
           <h6 class="card-text">
-            {{ profile.date_of_birth }} - there <br>
-            {% if profile.email == user.email or user.is_superuser %}
-              Username – {{ profile.username }} <br>
-            {% else %}
-              Username is hidden <br>
-            {% endif %}
+            Username – {{ profile.username }} <br>
             {% if profile.email %}
               Email – {{ profile.email }} <br>
             {% endif %}
