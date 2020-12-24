@@ -96,3 +96,6 @@ class UserLogoutView(APIView):
 
 class AdminLogoutView(UserLogoutView):
     url = '/admin/'
+
+    def get(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)

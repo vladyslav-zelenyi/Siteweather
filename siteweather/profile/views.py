@@ -1,7 +1,8 @@
 import logging
 
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, GenericAPIView
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
@@ -32,7 +33,7 @@ class UserProfile(RetrieveAPIView):
             return CustomUserSerializer
 
 
-class UserProfileUpdate(UpdateAPIView):
+class UserProfileUpdate(GenericAPIView):
     serializer_class = UpdateProfileSerializer
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     template_name = 'profile/profile_update.html'
@@ -46,9 +47,9 @@ class UserProfileUpdate(UpdateAPIView):
         serializer = UpdateProfileSerializer(user)
         return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        serializer = UpdateProfileSerializer(self.request.user, data=request.data, partial=partial)
+        serializer = self.serializer_class(self.request.user, data=request.data, partial=partial)
         if serializer.is_valid():
             self.perform_update(serializer)
             return Response({'message': 'You have successfully updated your profile', 'data': serializer.data},
@@ -61,10 +62,10 @@ class UserProfileUpdate(UpdateAPIView):
         serializer.save(self.request)
 
 
-class UserPasswordUpdate(UpdateAPIView):
+class UserPasswordUpdate(GenericAPIView):
     serializer_class = UpdatePasswordSerializer
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = [MultiPartParser, FormParser]
     template_name = 'profile/password_update.html'
 
     def get(self, request, *args, **kwargs):
@@ -72,7 +73,7 @@ class UserPasswordUpdate(UpdateAPIView):
         serializer = UpdatePasswordSerializer(user)
         return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         serializer = UpdatePasswordSerializer(self.request.user, data=request.data, partial=partial)
         if serializer.is_valid():

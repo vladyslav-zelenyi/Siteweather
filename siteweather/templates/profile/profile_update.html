@@ -157,10 +157,8 @@
         event.preventDefault();
         let form_data = new FormData($("#profile-update-form")[0]);
         form_data.append('file', $('input[type=file]')[0].files[0]);
-        {#let serializerData = $(this).serializeArray();#}
         $.ajax({
-          type: 'PUT',
-          {#data: serializerData,#}
+          type: 'PATCH',
           data: form_data,
           headers: {"X-CSRFToken": token},
           processData: false,

@@ -55,6 +55,7 @@ class UpdateProfileSerializer(RegistrationSerializer):
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'user_city', 'photo', 'photo_clear',
                   'date_of_birth']
 
+
     def validate_email(self, value):
         object_to_compare = CustomUser.objects.filter(email=value)
         if object_to_compare.exists() and self.instance.pk != object_to_compare[0].pk:
