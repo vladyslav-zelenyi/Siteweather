@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+
+{% block title %}
+  Site administration | Siteweather admin
+{% endblock %}
+
+{% block branding %}
+  <h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+      Siteweather administration
+    </a>
+  </h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

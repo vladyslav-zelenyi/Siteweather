@@ -1,10 +1,7 @@
-from datetime import timedelta
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.timezone import localtime
 
 
 ROLE_CHOICES = (
@@ -30,7 +27,7 @@ class CustomUser(AbstractUser):
     colored_premium.admin_order_field = 'role'
 
     def get_absolute_url(self):
-        return reverse('weather:profile', kwargs={'pk': self.pk})
+        return reverse('siteweather:profile', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.username

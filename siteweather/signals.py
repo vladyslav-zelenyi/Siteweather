@@ -24,8 +24,6 @@ def city_block_changes(sender, instance, created, **kwargs):
 def custom_user_changes(sender, instance, created, **kwargs):
     if created:
         logger.info(f'New user {instance} has been created')
-    else:
-        logger.info(f'User {instance} has been updated')
 
 
 @receiver(pre_delete, sender=CityBlock)

@@ -1,8 +1,7 @@
 import logging
 
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView, GenericAPIView
-from rest_framework.mixins import UpdateModelMixin
+from rest_framework.generics import RetrieveAPIView, GenericAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response

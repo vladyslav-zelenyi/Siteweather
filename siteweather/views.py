@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pytz
 import requests
+from django.forms import formset_factory
 from django.shortcuts import render, redirect
 from drf_yasg import openapi
 from drf_yasg.openapi import Parameter
@@ -16,7 +17,6 @@ from rest_framework.response import Response
 
 from task import settings
 from .api_paginators import RegisteredUsersPagination
-from .forms import CityBlockForm
 from .models import CityBlock, CustomUser
 from .serializers import CityBlockSerializer, CustomUserSerializer, DeleteCityBlockSerializer, \
     AdminDeleteCityBlockSerializer, FindCityBlockSerializer, SiteSettingsSerializer
@@ -174,7 +174,6 @@ class DeleteCityBlock(DestroyAPIView):
 
 
 class FindCity(CreateAPIView):
-    form_class = CityBlockForm
     template_name = 'siteweather/find_by.html'
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     parser_classes = (MultiPartParser, FormParser)
@@ -182,8 +181,7 @@ class FindCity(CreateAPIView):
     pagination_class = None
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class(request.user)
-        return render(request, self.template_name, {'form': form})
+        return render(request, template_name=self.template_name)
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
