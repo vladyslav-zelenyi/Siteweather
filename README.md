@@ -9,5 +9,5 @@ This is a test site that receives and filters weather data by city name from [op
 * Login - admin
 * Password - admin
 #
-#### Celery
+#### Celery configuration
 -A task worker -l info -B -Q celery,base,test_queue
