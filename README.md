@@ -8,3 +8,6 @@ This is a test site that receives and filters weather data by city name from [op
 #### Superuser login credentials
 * Login - admin
 * Password - admin
+#
+#### Celery settings
+-A task worker -l info -B -Q celery,base,test_queue
