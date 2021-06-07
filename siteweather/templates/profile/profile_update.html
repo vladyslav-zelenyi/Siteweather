@@ -166,8 +166,8 @@
           success: function () {
             location.href = '{% url 'siteweather:profile:profile' user.pk %}';
           },
-          failure: function (response) {
-            alert(response["responseJSON"]["error"]);
+          error: function (response) {
+            for (el in response["responseJSON"]["errors"]){alert(response["responseJSON"]["errors"][el])}
           }
         })
       })

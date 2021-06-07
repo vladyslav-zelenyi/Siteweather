@@ -119,6 +119,18 @@
               {% endfor %}
             {% endif %}
           </label>
+{#          <label for="id_preferred_choices">#}
+{#            <h6>Preferred choices:</h6>#}
+{#            <input type="checkbox" class="form-control" name="preferred_choices"#}
+{#            value="{{ data.preferred_choices }}" required="" id="id_preferred_choices"> <br>#}
+{#            {% if errors %}#}
+{#              {% for error in errors.preferred_choices %}#}
+{#                <div class="alert alert-danger">#}
+{#                  <strong>{{ error|escape }}</strong>#}
+{#                </div>#}
+{#              {% endfor %}#}
+{#            {% endif %}#}
+{#          </label>#}
           <button type="submit" class="btn-outline-primary btn btn-block">
             Submit
           </button>

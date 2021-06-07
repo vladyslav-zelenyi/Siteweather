@@ -23,7 +23,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def get_age(self, obj):
         today = localtime()
-        age = (today.date() - obj.date_of_birth).days // 365.25
+        try:
+            age = (today.date() - obj.date_of_birth).days // 365.25
+        except Exception:
+            age = 0
         return int(age)
 
     def get_is_registered_recently(self, obj):
@@ -54,7 +57,6 @@ class UpdateProfileSerializer(RegistrationSerializer):
         model = CustomUser
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'user_city', 'photo', 'photo_clear',
                   'date_of_birth']
-
 
     def validate_email(self, value):
         object_to_compare = CustomUser.objects.filter(email=value)

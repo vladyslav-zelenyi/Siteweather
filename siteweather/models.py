@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html
-
+from django.contrib.postgres.fields import ArrayField
 
 ROLE_CHOICES = (
     ('Standard', 'Standard'),
@@ -38,24 +38,33 @@ class CustomUser(AbstractUser):
         ordering = ['username']
 
 
+class WeatherDescription(models.Model):
+    short_description = models.CharField(verbose_name='Main description', max_length=300, blank=True)
+    full_description = models.CharField(verbose_name='Full description', max_length=300, blank=True)
+    weather_icon = models.CharField(verbose_name='Icon', max_length=300, default='01d', blank=True, unique=True,
+                                    primary_key=True)
+
+
+class Location(models.Model):
+    city_name = models.CharField(verbose_name='Name of city', max_length=300, unique=True, primary_key=True)
+    country = models.CharField(verbose_name='Country', max_length=300, default='Unknown', blank=True)
+
+
 class CityBlock(models.Model):
-    city_name = models.CharField(verbose_name='Name of city', max_length=300)
-    weather_main_description = models.CharField(verbose_name='Main description', max_length=300, blank=True)
-    weather_full_description = models.CharField(verbose_name='Full description', max_length=300, blank=True)
-    timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Timestamp',)
+    location = models.ForeignKey(Location, on_delete=models.DO_NOTHING, blank=True, null=True)
+    weather_description = models.ForeignKey(WeatherDescription, on_delete=models.DO_NOTHING, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Timestamp')
     temperature = models.IntegerField(verbose_name='Temperature', default=0, blank=True)
-    weather_icon = models.CharField(verbose_name='Icon', max_length=300, default='01d', blank=True)
     humidity = models.IntegerField(verbose_name='Humidity', default=0, blank=True)
     pressure = models.IntegerField(verbose_name='Pressure', default=0, blank=True)
     wind_speed = models.IntegerField(verbose_name='Wind speed', default=0, blank=True)
-    country = models.CharField(verbose_name='Country', max_length=300, default='Unknown', blank=True)
     searched_by_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
 
     def get_absolute_url(self):
         return reverse('siteweather:view_city', kwargs={'pk': self.pk})
 
     def __str__(self):
-        return self.city_name
+        return self.location.city_name
 
     class Meta:
         verbose_name = 'City'

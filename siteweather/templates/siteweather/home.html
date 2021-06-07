@@ -30,17 +30,17 @@
     <div class="card mb-4">
       <div class="card-header">
         <h5>
-          {{ item.city_name }} | {{ item.country }}
+          {{ item.location.city_name }} | {{ item.location.country }}
         </h5>
       </div>
       <div class="card-body">
         <div class="media">
-          <img src="https://openweathermap.org/img/w/{{ item.weather_icon }}.png" alt="icon">
+          <img src="https://openweathermap.org/img/w/{{ item.weather_description.weather_icon }}.png" alt="icon">
           <div class="media-body">
             <h6 class="card-text">{{ item.temperature }}°C</h6>
-            <h5 class="card-text">{{ item.weather_main_description }}
+            <h5 class="card-text">{{ item.weather_description.short_description }}
             </h5>
-            <a href="{% url 'siteweather:view_city' item.pk %}" class="btn btn-outline-primary btn-block">Read more</a>
+            <a href="{% url 'siteweather:view_city' item.id %}" class="btn btn-outline-primary btn-block">Read more</a>
           </div>
         </div>
       </div>

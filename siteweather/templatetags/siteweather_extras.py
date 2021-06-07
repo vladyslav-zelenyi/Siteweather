@@ -8,7 +8,7 @@ register = template.Library()
 
 @register.simple_tag
 def searched_counter(city_name, request):
-    count = CityBlock.objects.filter(city_name=city_name, searched_by_user=request.user.id).count()
+    count = CityBlock.objects.filter(location=city_name, searched_by_user=request.user.id).count()
     return {'count': count}
 
 

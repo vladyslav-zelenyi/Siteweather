@@ -15,17 +15,18 @@ class CityBlockInline(admin.TabularInline):
     extra = 1
     max_num = 5
     fields = ('timestamp', 'city_name', 'weather_full_description', 'temperature')
-    readonly_fields = fields
+    # readonly_fields = fields
     ordering = ('-timestamp',)
 
 
 @admin.register(CityBlock)
 class CityBlockAdmin(ModelAdmin):
-    list_display = (
-        'city_name', 'weather_main_description', 'weather_full_description', 'timestamp', 'temperature', 'wind_speed',
-        'humidity', 'pressure', 'searched_by_user')
-    list_display_links = ('city_name',)
-    list_filter = ('city_name', 'timestamp')
+    # list_display = ('', )
+    # list_display = (
+    #     'city_name', 'weather_main_description', 'weather_full_description', 'timestamp', 'temperature', 'wind_speed',
+    #     'humidity', 'pressure', 'searched_by_user')
+    # list_display_links = ('city_name',)
+    # list_filter = ('city_name', 'timestamp')
     list_per_page = 20
     search_fields = ('city_name', 'searched_by_user__username')
 

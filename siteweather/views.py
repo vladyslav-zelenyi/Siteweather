@@ -3,7 +3,6 @@ from datetime import datetime
 
 import pytz
 import requests
-from django.forms import formset_factory
 from django.shortcuts import render, redirect
 from drf_yasg import openapi
 from drf_yasg.openapi import Parameter
@@ -17,7 +16,7 @@ from rest_framework.response import Response
 
 from task import settings
 from .api_paginators import RegisteredUsersPagination
-from .models import CityBlock, CustomUser
+from .models import CityBlock, CustomUser, WeatherDescription, Location
 from .serializers import CityBlockSerializer, CustomUserSerializer, DeleteCityBlockSerializer, \
     AdminDeleteCityBlockSerializer, FindCityBlockSerializer, SiteSettingsSerializer
 
@@ -196,21 +195,40 @@ class FindCity(CreateAPIView):
         city_name = serializer.validated_data.get('city_name')
         url = f'{settings.SITE_WEATHER_URL}?q={city_name}&appid={settings.APP_ID}&units=metric'
         r = requests.get(url).json()
-        city_weather = {
+
+        weather_description = {
+            'short_description': r['weather'][0]['main'],
+            'full_description': r['weather'][0]['description'],
+            'weather_icon': r['weather'][0]['icon']
+        }
+        try:
+            weather_description_object = WeatherDescription.objects.create(**weather_description)
+        except Exception:
+            weather_description_object = WeatherDescription.objects.get(weather_icon=r['weather'][0]['icon'])
+
+        location = {
             'city_name': r['name'],
-            'weather_main_description': r['weather'][0]['main'],
-            'weather_full_description': r['weather'][0]['description'],
-            'weather_icon': r['weather'][0]['icon'],
+            'country': r['sys']['country']
+        }
+
+        try:
+            location_object = Location.objects.create(**location)
+        except Exception:
+            location_object = Location.objects.get(city_name=r['name'])
+
+        city_weather = {
             'temperature': r['main']['temp'],
             'humidity': r['main']['humidity'],
             'pressure': r['main']['pressure'],
             'wind_speed': r['wind']['speed'],
-            'country': r['sys']['country'],
         }
         if self.request.user.is_authenticated:
             city_weather['searched_by_user'] = self.request.user
         else:
             city_weather['searched_by_user'] = CustomUser.objects.get(pk=1)
+
+        city_weather['weather_description'] = weather_description_object
+        city_weather['location'] = location_object
         city = CityBlock.objects.create(**city_weather)
         return city.pk
 
